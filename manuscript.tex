@@ -1,0 +1,651 @@
+% -*- TeX-engine: luatex; -*-
+% Copyright (C) 2023 Wing Hei Chan
+
+% This work is licensed under a Creative Commons
+% Attribution-ShareAlike 4.0 International license.  To view a copy of
+% this license, visit
+% <https://creativecommons.org/licenses/by-sa/4.0/>.
+
+\documentclass[12pt, a4paper]{report}
+\usepackage{imakeidx}
+\usepackage{setspace}
+\usepackage[type={CC},modifier={by-sa},version={4.0}]{doclicense}
+\usepackage[margin=1in]{geometry}
+\usepackage{lua-widow-control}
+\usepackage{microtype}
+\usepackage{mathtools}
+\usepackage{unicode-math}
+\usepackage[style]{abstract}
+\usepackage[style=unified]{biblatex}
+\usepackage[style=british]{csquotes}
+\usepackage{datetime}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usepackage[linguistics]{forest}
+\usepackage{linguex}
+
+\onehalfspacing
+\setlist{noitemsep}
+\titleformat{\chapter}{\normalfont\huge\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{
+  0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+
+\setmainfont{Libertinus Serif}
+\setmathfont{Libertinus Math}
+\setmonofont[Scale=MatchUppercase]{Iosevka}
+
+\addbibresource{./reference.bib}
+
+\makeindex[intoc]
+
+\newdateformat{monthyyyy}{\monthname[\THEMONTH] \THEYEAR}
+
+\DeclareNameWrapperFormat{labelname:poss}{#1's}
+\newrobustcmd*{\posscitealias}{%
+  \AtNextCite{\DeclareNameWrapperAlias{labelname}{labelname:poss}}}
+\newrobustcmd*{\posscite}{\posscitealias\textcite}
+
+\usetikzlibrary{automata}
+\tikzset{auto}
+\forestset{auto/.style={for root={baseline}, for tree={calign=first}}}
+
+\newcommand{\context}{\mathrel{/}}
+\newcommand{\cuhk}{The Chinese University of Hong Kong}
+\newcommand{\gap}{\underline{\hspace{1em}}}
+\newcommand{\textemph}[1]{\textsc{#1}}
+\newcommand{\textphon}[1]{[#1]}
+\newcommand{\textterm}[1]{\textsc{#1}\index{#1}}
+
+\begin{document}
+\pagenumbering{alph}
+\begin{titlepage}
+  \vspace*{\fill}
+  \begin{center}
+    \begin{Large}
+      \bfseries
+      Subregular Complexity of Tonal Systems:
+
+      Case Studies of Chinese Languages
+    \end{Large}
+
+    by
+
+    CHAN Wing Hei
+
+    under
+
+    Professor LAI Yee King Regine
+
+    \bigskip
+
+    A Thesis To Be Submitted in Partial Fulfilment of
+
+    the Requirement for the Degree of
+
+    Bachelor of Arts
+
+    in
+
+    Linguistics
+
+    \bigskip
+
+    \cuhk
+
+    \monthyyyy\formatdate{28}{12}{2022}
+  \end{center}
+  \pretocmd{\doclicenseLongText}{%
+    Copyright \copyright\ 2023 Wing Hei Chan\par}{}{}
+  \doclicenseThis
+  \vspace*{\fill}
+\end{titlepage}
+
+\cleardoublepage
+\pagenumbering{roman}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Phonological transformations based on finite-state transducers have
+received an important status since their introduction under the guise
+of rewrite rules.  Finite-state transducers represent regular
+relations, which are closed under composition.  This shows that an
+apparently complex system of phonological rules can be compiled into a
+single finite-state transducer.  On the other hand, regular relations
+are still too powerful as a probable upper bound of the complexity of
+phonological transformations.  For example, regular relations are able
+to encode such a phonological transformation that only applies to an
+even number of terms, obviously unattested as an adequate rule.
+
+Recently, studies of the so-called subregular classes, that is,
+classes even weaker than regular relations, have proved a more
+probable upper bound.  Such classes are conceptualized as a hierarchy,
+not unlike the traditional Chomsky hierarchy in formal language
+theory.  The remaining problem is how many phonological phenomena are
+explainable and, more importantly, \textemph{not} explainable by each
+class.  In this inquiry, tonal systems post an interesting challenge,
+and thus require a more in-depth investigation.
+
+Traditionally, tonal systems are accounted for by nonlinear phonology,
+which involves the use of multiple phonological tiers and their
+associations.  This process can be carefully separated into two ideas:
+%
+\begin{enumerate}
+\item Tones can be independently represented on a separate tier just
+  as segments do;
+\item The associations between phonological tiers interact with tonal
+  transformations in a nontrivial way.
+\end{enumerate}
+%
+In this thesis, the two ideas are examined under the lens of attested
+tonal systems found in Chinese languages with vastly different tonal
+transformations.  Computationally, the former is embodied by linear
+strictly local functions, and the latter by autosegmental strictly
+local functions.  Their implication applies not only to tonal systems,
+but also to the interfaces between linguistic levels in general.
+
+\tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\chapter{Theoretical Background}
+This chapter introduces the theoretical foundations needed for the
+interpretation of tonal systems.  The theories are presented from two
+perspectives, namely theoretical and computational phonology, which
+utilize different methodologies.  Although this thesis uses a
+computational approach, the theoretical implication requires an
+understanding of relevant approaches as well.
+
+Specifically, the focus is placed on phonological
+\textterm{transformations} as opposed to \textterm{phonotactics}.
+Their distinction corresponds to the distinction between transducers
+and acceptors in automata theory, which reflect translation and
+membership problems respectively.  Loosely speaking, a transducer is a
+function of type \(\alpha \to \beta\), while an acceptor is a function
+of type \(\alpha \to \mathit{Boolean}\), that is, a
+predicate.\footnote{Unless a gradient interpretation of phonotactics
+  is required, in which case the output type can be, for example, an
+  interval type.}  The latter will be briefly mentioned as the
+theories are introduced.
+
+Given the theoretical background, this chapter then explains the
+rationales behind the chosen methodology as well as the expected
+results.  In particular, this thesis has the goal of clarifying the
+unique operations on autosegmental representations that empower them
+to account for certain tonal transformations.
+
+\section{Theoretical Phonology}
+This section details the presentations of phonological transformations
+in theoretical phonology.  Phonological transformations have been
+employed by two allegedly divergent formalisms, often named linear and
+nonlinear phonology.  As explained in the later section on the
+computational perspective, this categorization fails to recognize the
+actual properties that render computationally more complex formalisms
+necessary.  Nonetheless, this section will follow the traditional
+categorization.
+
+This section also discusses the organization of grammar.  As will
+become clear once computational models are introduced, organization
+only matters in the compositions of phonological transformations,
+contrary to the common conception that cyclicity and ordering are
+inherent properties of phonological systems.  Lexical phonology is
+mentioned for its significance in the arguments against cyclicity.
+
+The discussion of \textterm{optimality theory} as in
+\textcite{ps93otcigg} is intentionally omitted.  The reason is not
+that optimality theory is a worse formalism, but merely that the
+formalization of it results in computational devices out of the scope
+of this thesis.  Specifically, optimality theory, due to its
+constraint-optimizing nature, requires constraint optimizers rather
+than transducers, which are potentially powerful enough to
+overgenerate.  For such an implementation based on dynamic
+programming, refer to \textcite{t95cot}.  For discussions of the
+computational complexity of optimality theory, refer to
+\textcite{e97egpot, i06sptotci, hkr09ecot}, among others.
+
+\subsection{Linear Phonology}
+The earliest discussion of phonological transformations dates back to
+\textcite{ch68spe}, where rules are in the form of context-sensitive
+rewrite rules.  For example, a vowel nasalization rule can be in the
+form
+
+\ex. \(\text{V} \to [+\text{nasal}]
+\context \text{\gap}[+\text{nasal}]\)
+
+read as \enquote{nasalize a vowel immediately before a nasal sound}.
+Under the usual notation of rewrite rules, this is written as
+
+\ex. \(\text{V}[+\text{nasal}] \to
+(\text{V} \cup [+\text{nasal}])[+\text{nasal}]\)
+
+understood as \enquote{rewrite a vowel immediately before a nasal
+  sound to the union of the vowel and the singleton set of the nasal
+  feature}.  It should be noted that this apparently context-sensitive
+form is by no means actually context-sensitive.  What it means is
+that, given the Chomsky hierarchy \parencite{c59cfpg}
+
+\ex. \(\text{Recursively enumerable} \supset
+\text{Context-sensitive} \supset
+\text{Context-free} \supset
+\text{Regular}\)
+
+it is not true that phonological transformations form a superset of
+context-free relations.  This is shown in the later section on regular
+relations.
+
+Attention should be paid to the term \enquote{linear}.  The
+interpretation of the term is that phonological transformations apply
+to a linear sequence of segments.  This implies the assumption that
+segmental phonology, the sort that is dealt with above, is disjoint
+from nonsegmental phonology.  This assumption is computationally
+unsound, as nonsegmental phonology does not necessarily require
+\enquote{nonlinear} accounts.  Another interpretation has to do with
+the notion of locality, which is an often misunderstood notion in
+theoretical phonology.
+
+A relevant concern is the representations of tonal features.  Indeed,
+due to the \enquote{linear} nature of the representations, tonal
+features have nowhere else to fit in but the same feature sets as the
+segmental features.  Consider, for example, \posscite{w67pft}
+interesting characterization of Xiamen tone cycle:
+
+\ex. \([\mathop{\alpha}\text{high}, \mathop{\beta}\text{fall}]
+\to [\mathop{\beta}\text{high}, \mathop{-\alpha}\text{fall}]\)
+
+This rule not only uses the same \textemph{form} as segmental rules,
+but also the same \textemph{representation}.  Of course, it is not a
+problem if the rule explains the tone cycle well.\footnote{See,
+  however, \posscite{c00tspcd} criticism of the characterization.}  On
+the other hand, a nonlinear account allows more freedom both in the
+form and representation of the rule.  Readers are thus reminded that
+representation is a separate matter from the computational complexity
+of the formalism \textemph{independent} of representation.
+
+\subsection{Nonlinear Phonology}
+Despite the remarks given above, nonsegmental phonology is precisely
+what has inspired the development of nonlinear phonology, also known
+as autosegmental phonology.  Early applications of nonlinear phonology
+can be found in \textcite{c76vhngpam, g76ap}, among others.  Under
+nonlinear phonology, phonological representations consist of multiple
+associated tiers, each tier with its own linear sequence of terms.
+For example, a syllable \textphon{ma} with a high level tone can be
+represented as
+
+\ex.
+\begin{forest}
+  auto, [ma [\(\sigma\) [H] [H]]]
+\end{forest}
+
+where \(\sigma\) stands for a syllable and H stands for a high tone.
+Consequently, phonological transformations are generalized to operate
+on associations.  An unbounded tone spreading rule is:
+
+\ex. \(
+\begin{forest}
+  auto, [T [\(\sigma\)] [\(\sigma\), no edge] [\(\sigma\), no edge]]
+\end{forest}
+\to
+\begin{forest}
+  auto, [T [\(\sigma\)] [\(\sigma\)] [\(\sigma\), no edge]]
+\end{forest}
+\to
+\begin{forest}
+  auto, [T [\(\sigma\)] [\(\sigma\)] [\(\sigma\)]]
+\end{forest}\)
+
+An implicit assumption of it is that the rule applies iteratively from
+left to right.  This intuition is, surprisingly, captured equally well
+by linear transformations.  An equally acceptable formulation is the
+linear transformation
+
+\ex. \(\text{T}\varepsilon\varepsilon
+\to \text{TT}\varepsilon
+\to \text{TTT}\)
+
+where \(\varepsilon\) stands for the empty term, assuming the
+transformation also applies iteratively from left to right.
+
+The pair of examples above suggests that the power of nonlinear
+phonology comes not from the representations, nor from the capability
+of iterative application.  Instead, it comes from the ability to
+encode the associations in the transformations, as explicified by the
+computational models.  Iterative application, on the other hand,
+concerns the computational nature of the rules.  As a computer
+scientist may say, a transformation is \enquote{mapped} to a sequence
+in a certain order, resulting in the apparently long-distance
+transformation.
+
+A point should be made that iterative application has little to do
+with the organization of grammar.  An iteratively applied phonological
+transformation is neither inherently associated with cyclicity nor
+with ordering.  In fact, it is not necessarily iterative at all under
+an alternative representation.  The only thing relevant is the
+\textemph{process} the rule generates as embodied by the equivalent
+transducer.
+
+\subsection{Organization of Grammar}
+What organization of grammar concerns is, then, \textemph{not} the
+computational nature of phonological transformations, but rather the
+use of linguistic formalisms to express computationally equivalent
+models.\footnote{This is not to deny that linguistic formalisms differ
+  in their expressivity in a nontrivial manner.  Expressivity and
+  computability are orthogonal, as the famous \enquote{Turing tarpit}
+  analogy puts it \parencite{p82ep}.}  This is reminiscent of the use
+of programming paradigms to express computationally equivalent
+programs given their Turing completeness, except we expect a much
+weaker upper bound in phonological models.
+
+The concept of \textterm{cyclicity}, that is, repeatedly applying a
+phonological transformation until it is no longer applicable, played
+an important role in early formulations of nonsegmental phonology.
+The idea is that a series of rules is linearly sequenced as
+\(R_{1}, \ldots, R_{n}\), where \(R_{n}\) is a rule that creates new
+contexts for the previous rules, often conceived as a \enquote{bracket
+  erasure} rule.  This brings two problems:
+%
+\begin{enumerate}
+\item The end result of rule applications is tightly coupled with how
+  contexts are represented;
+\item It is not clear how to apply different sequences of rules at
+  each level of representation.
+\end{enumerate}
+%
+The former is hardly an inherent or unique problem of cyclicity.  The
+latter, in comparison, is a more serious problem, as it prohibits an
+otherwise modular organization of grammar by the virtue of
+\enquote{rules bloat}.  Alternatively, \textterm{lexical phonology}
+advocates for a \enquote{stratified} approach \parencite{k82cplp},
+thus achieving a more modular organization.  This thesis adopts the
+general approach of lexical phonology without assuming any form of the
+lexicalist hypothesis.
+
+The \textterm{ordering} of phonological transformations, on the other
+hand, is a more universal problem.  Even simply modeling phonological
+transformations as functions already leads to the ordering problem, as
+
+\ex. \(\neg(\forall f, g\ldotp f \circ g \implies g \circ f)\)
+
+That is, function composition is noncommutative.  Therefore, this
+thesis does not expect this problem to be easily solved.
+
+\section{Computational Phonology}
+This section introduces computational formalization of phonological
+transformations in terms of regular relations, in particular
+subregular functions.  The main method of computationally formalizing
+phonological transformations concerns the use of machines in the sense
+of automata theory.  In particular, finite-state machines are used for
+their limited computational complexity.  They are able to encode
+regular relations, but not context-sensitive or even context-free
+relations due to their lack of a stack.
+
+Logical encodings of regular relations are also introduced along with
+their transductions.  Encoding regular relations in terms of logical
+formulae facilitates the understanding of their subparts as compared
+to transducers and enables the evaluation of their computational
+complexity as first-order, quantifier-free, among others.
+
+\subsection{Regular Relation}
+The apparently context-sensitive phonological rules have the important
+constraint that all terms are \textterm{terminal}, that is, not able
+to be further rewritten into themselves, directly or indirectly.  As
+\textcite{c59cfpg} points out, the distinguishing feature of
+context-free languages is exactly the ability to self-embed, which
+requires recursively rewriting \textterm{nonterminal} terms into
+themselves preceded and followed by other terms.  Formally, a grammar
+is self-embedding iff
+
+\ex. \(\exists A, \varphi, \psi\ldotp A \Rightarrow \varphi A \psi\)
+
+where neither \(\varphi\) nor \(\psi\) is the identity term and
+\(\Rightarrow\) consists of any number of rewrite steps.  Clearly,
+phonological rules cannot express such a transformation.
+\textcite{kk94rmprs} therefore suggests modeling phonological
+transformations as \textterm{regular} relations.
+
+Regular relations are relations whose domains and ranges are regular
+languages.  An artificial regular relation, for example, is a relation
+that rewrites any sequence that has an \textemph{even} number of
+\(a\)s to a sequence with each \(a\) replaced by \(b\).  This is an
+unattested phonological transformation, but it is a valid regular
+relation, showcasing that regular relations are still computationally
+too complex for modeling phonological transformations.
+
+Regular relations can be represented as the equivalent
+\textterm{finite-state} transducers.  Finite-state transducers are
+machines that transit between a finite number of states according to
+the currently read term, where transitions emit the output terms.  To
+put it another way, \textterm{acceptors} are machines that accept
+\textemph{one} sequence of terms, while \textterm{transducers} are
+ones that accept \textemph{two} sequences of terms, namely the input
+and output sequences.  The artificial regular relation above requires
+a \textterm{nondeterministic} finite-state transducer that either
+rewrites \(a\) to \(b\) or does not, whose validity is only determined
+after the whole input sequence is read:
+
+\ex.
+\begin{tikzpicture}[baseline=(bow.base)]
+  \node[state] at (0,0) (bow) {\(q_{1}\)};
+  \node[state,accepting] at (2,1) (noop) {\(q_{2a}\)};
+  \node[state] at (4,1) (invalid) {\(q_{3a}\)};
+  \node[state] at (2,-1) (write) {\(q_{2b}\)};
+  \node[state,accepting] at (4,-1) (valid) {\(q_{3b}\)};
+  \path[->]
+  (bow) edge [loop left] node {\(\text{?}:\text{?}\)} ()
+  (bow) edge node {\(a:a\)} (noop)
+  (noop) edge [loop above] node {\(\text{?}:\text{?}\)} ()
+  (noop) edge [bend left] node {\(a:a\)} (invalid)
+  (invalid) edge [loop above] node {\(\text{?}:\text{?}\)} ()
+  (invalid) edge [bend left] node {\(a:a\)} (noop)
+  (bow) edge ['] node {\(a:b\)} (write)
+  (write) edge [loop below] node {\(\text{?}:\text{?}\)} ()
+  (write) edge [bend left] node {\(a:b\)} (valid)
+  (valid) edge [loop below] node {\(\text{?}:\text{?}\)} ()
+  (valid) edge [bend left] node {\(a:b\)} (write);
+\end{tikzpicture}
+
+This artificial regular relation is unattested, which means the
+transducer overgenerates.  Ideally, two additional constraints are
+desired:
+%
+\begin{enumerate}
+\item The transducers be \textterm{deterministic} to exclude multiple
+  outputs;
+\item The transducers be \textterm{local} to limit the required memory
+  resource.
+\end{enumerate}
+%
+These two constraints, in turn, lead to subregular functions.
+
+Alternatively, regular relations can be represented as logical
+transductions, specifically \textterm{monadic second-order} ones as
+those of \textcite{eh01mdsttft}, which are actually able to represent
+nonregular relations.\footnote{An example is the first-order definable
+  total reduplication \(w \to ww\), whose output language is included
+  in the class of tree-adjoining languages \parencite{sw94efecg}.}
+Monadic second-order logic allows quantification over sets, which is
+needed for the definition of general precedence \(<\) based on
+immediate precedence \(\vartriangleleft\):
+
+\ex.
+\a. \(\mathit{Closed}(X) \coloneq \forall x, y\ldotp
+(x \in X \land x \vartriangleleft y) \implies y \in X\)
+\b. \(x < y \coloneq \forall X\ldotp
+(x \in X \land \mathit{Closed}(X)) \implies y \in X\)
+
+This is understood as \enquote{\(x\) precedes \(y\) iff every
+  transitive closure of immediate precedence that includes \(x\) also
+  includes \(y\)}, which means the minimal one of such transitive
+closures also includes \(y\).  A relation is then defined that
+expresses that an \(a\) immediately precedes another \(a\) ignoring
+other non-\(a\)s between them:
+
+\ex. \(x \vartriangleleft_{a} y \coloneq a(x) \land a(y) \land x < y
+\land \neg(\exists z\ldotp a(z) \land x < z \land z < y)\)
+
+The notion of the evenness of the number of \(a\)s is finally defined:
+
+\ex.
+\a. \(\mathit{Odd}(x) \coloneq (a(x) \land (\forall y\ldotp
+y < x \implies \neg a(y))) \lor (\exists y\ldotp
+\mathit{Even}(y) \land y \vartriangleleft_{a} x))\)
+\b. \(\mathit{Even}(x) \coloneq \exists y\ldotp
+\mathit{Odd}(y) \land y \vartriangleleft_{a} x\)
+
+Accordingly, the transduction is defined:
+
+\ex. \(b'(x) \coloneq b(x) \lor (a(x) \land (\exists y\ldotp
+\mathit{Even}(y) \land (\forall z\ldotp y < z \implies \neg a(z))))\)
+
+Similar to how finite-state transducers are constrained, logical
+transductions of the sort above are avoided if
+%
+\begin{itemize}
+\item Quantification over sets is disallowed; or
+\item Any quantification is disallowed.
+\end{itemize}
+%
+They result in \textterm{first-order} logic and its
+\textterm{quantifier-free} version respectively, which correspond to
+various subregular functions.
+
+Despite their inadequate computational complexity, regular relations
+are useful as they are closed under composition, meaning that
+
+\ex. \(\forall P, Q\ldotp (\mathit{Regular}(P) \land
+\mathit{Regular}(Q)) \implies \mathit{Regular}(P \circ Q)\)
+
+This enables the possibility to compile an apparently complex system
+of phonological rules into a single finite-state transducer.
+
+\subsection{Subregular Function}
+The most trivial class of \textterm{subregular} functions is without a
+doubt the class of finite functions, which is disfavored in this
+thesis for the reasons mentioned in \textcite{s93wimpatlai}.  Rather,
+by enforcing the aforementioned constraints, several nontrivial
+classes of subregular functions can be subdivided.  If the
+finite-state transducers are required to be deterministic, the
+resulting subregular functions are \textterm{subsequential} functions,
+further classified into left and right variants depending on the
+direction the input sequence is read \parencite{ch12bcsimr, hl13vhs}.
+This class is not particularly interesting for the purposes of this
+thesis, as it lacks a meaningful notion of locality.
+
+The concept of \textterm{strict locality} is defined for regular
+languages, which concerns the recognition of substrings
+\parencite{rp11apresh, rhfhlw13csc}.  Borrowing this concept, input
+strictly local and output strictly local functions can be defined over
+\textterm{linear} representations, which \enquote{remember} a finite
+length of input and output substrings respectively
+\parencite{ceh14lslsf}.  Similar to subsequential functions, output
+strictly local functions can be further classified into left and right
+variants \parencite{ceh15oslf}.
+
+An example of input strictly local function is the function that
+rewrites \(a\) to \(b\) whenever the last input is \(a\).  That is,
+
+\ex. \(a^{n+1} \to ab^{n}\)
+
+where \(n \in \mathbb{N}\), with the equivalent transducer
+
+\ex.
+\begin{tikzpicture}[baseline=(loop.base)]
+  \node[state,initial,initial text={\(a:a\)}] at (0,0) (loop) {\(a\)};
+  \path[->] (loop) edge [loop right] node {\(a:b\)} ();
+\end{tikzpicture}
+
+where the remembered input term is encoded in the state.  More
+conveniently, it can also be represented as the logical transduction
+
+\ex.
+\a. \(a'(x) \coloneq a(x) \land \neg(a(\mathit{pred}(x)))\)
+\b. \(b'(x) \coloneq a(x) \land a(\mathit{pred}(x))\)
+
+where \(\mathit{pred}\) is the predecessor function.
+
+Similarly, an example of left output strictly local function is the
+function that rewrites \(a\) to \(b\) whenever the last output is
+\(a\).  That is,
+
+\ex.
+\a. \(a^{2n} \to a^{n}b^{n}\)
+\b. \(a^{2n+1} \to a^{n+1}b^{n}\)
+
+with the equivalent transducer
+
+\ex.
+\begin{tikzpicture}[baseline=(a.base)]
+  \node[state,initial,initial text={\(a:a\)}] at (0,0) (a) {\(a\)};
+  \node[state] at (2,0) (b) {\(b\)};
+  \path[->]
+  (a) edge [bend left] node {\(a:b\)} (b)
+  (b) edge [bend left] node {\(a:a\)} (a);
+\end{tikzpicture}
+
+where the remembered output terms are encoded in the states.  When it
+is represented as a logical transduction, however, there occurs
+\textterm{recursive} logical formulae,\footnote{Readers familiar with
+  fixed-point theorems may expect to see a fixed-point logic
+  undermining such recursive logical formulae.  The technical details
+  can be found in \textcite{koj18taolns, cj19qlfpfp}.} resulting in a
+recursive strictly local function:
+
+\ex.
+\a. \(a'(x) \coloneq a(x) \land \neg(a'(\mathit{pred}(x)))\)
+\b. \(b'(x) \coloneq a(x) \land a'(\mathit{pred}(x))\)
+
+As \textcite{cj21iolr} conjectures, recursive logical transductions
+comprise precisely the logical characterization of output strictly
+local functions.
+
+Logical encodings enable the generalization of strict locality over
+\textterm{autosegmental} representations \parencite{cj19aislf}.  Under
+a predicate logic, associations are understood as a binary relation
+\(\mathit{Assoc}\) where \(\mathit{Assoc}(a, b)\) indicates that \(a\)
+and \(b\) are associated, given that \(a\) and \(b\) are on separate
+tiers.\footnote{A question can be asked whether \(\mathit{Assoc}\) is
+  symmetric.  Although this question has no particular bearing,
+  \(\mathit{Assoc}\) is assumed to be antisymmetric to allow the
+  interpretation of autosegmental representations as directed graphs.}
+For example, the unbounded tone spreading rule can be defined as the
+recursive logical transduction
+
+\ex. \(\mathit{Assoc}'(x, y) \coloneq \mathit{Assoc}(x, y) \lor
+\mathit{Assoc}'(x, \mathit{pred}(y))\)
+
+
+Strictly local logical tranductions, as shown thus far, satisfy both
+first-orderness and quantifier-freeness.  This is not a coincidence,
+but rather the expected outcome.  By disallowing quantification,
+logical formulae are allowed to refer to terms other than the bounded
+ones only by the means of the predecessor and successor functions,
+which in turn allude to the notion of locality.
+
+\section{Preliminary Goal}
+Chinese languages have been famous for their rich repertoire of tonal
+systems and relevant transformations.  In particular, tonal
+transformations in Chinese languages often interact with the
+morphosyntactic representations.  This fact has inspired analyses that
+require morphosyntactic encodings in phonological representations.
+This thesis expects to formulate such techniques in terms of strictly
+local functions.
+
+Another question this thesis aims to answer is why autosegmental
+representations appear necessary.  Indeed, as later shown,
+autosegmental representations impose the requirement that phonological
+representations be graphs as opposed to linear sequences of terms.
+This question is impossible to answer without assessing what
+autosegmental representations are useful for.
+
+Finally, this thesis attempts to supply a theoretical interpretation
+of the computational analyses.  The theoretical implication of
+strictly local functions, this thesis believes, is more general than
+the study of computational complexity.  Potentially, it relates to the
+more difficult problem of the interfaces between linguistic levels.  A
+complete answer to this question requires a better understanding of
+the primitives and operations each level allows.
+
+\printbibliography[heading=bibintoc]
+
+\printindex
+\end{document}
