@@ -494,7 +494,12 @@ y < x \implies \neg a(y))) \lor (\exists y\ldotp
 \b. \(\mathit{Even}(x) \coloneq \exists y\ldotp
 \mathit{Odd}(y) \land y \vartriangleleft_{a} x\)
 
-Accordingly, the transduction is defined:
+Accordingly, the transduction is defined:\footnote{Observant readers
+  may notice that an efficient transducer implementing said
+  transduction reads the input \textemph{twice}, dispatching on the
+  number of \(a\)s in the first pass.  This is due to the
+  correspondence between monadic second-order logic and two-way
+  finite-state transducers.}
 
 \ex. \(b'(x) \coloneq b(x) \lor (a(x) \land (\exists y\ldotp
 \mathit{Even}(y) \land (\forall z\ldotp y < z \implies \neg a(z))))\)
