@@ -21,6 +21,7 @@
 \usepackage{datetime}
 \usepackage{enumitem}
 \usepackage{titlesec}
+\usepackage{ebproof}
 \usepackage{tikz}
 \usepackage[linguistics]{forest}
 \usepackage{linguex}
@@ -620,6 +621,37 @@ recursive logical transduction
 
 \ex. \(\mathit{Assoc}'(x, y) \coloneq \mathit{Assoc}(x, y) \lor
 \mathit{Assoc}'(x, \mathit{pred}(y))\)
+
+Is it then easy to see why it works equally well for linear
+representations.  \(\mathit{Assoc}\) is merely used to represent the
+presence of tones:
+
+\ex.
+\a. \(\text{T}(x) = \exists y\ldotp \mathit{Assoc}(y, x)\)
+\b. \(\text{T}'(x) = \exists y\ldotp \mathit{Assoc}'(y, x)\)
+
+This makes it possible to surject the autosegmental transformation
+into a linear one:
+
+\ex.
+\a. \(\text{T}'(x) \coloneq
+\text{T}(x) \lor \text{T}'(\mathit{pred}(x))\)
+\b.
+\begin{prooftree}
+  \hypo{\mathit{Assoc}'(a, x) =
+    \mathit{Assoc}(a, x) \lor \mathit{Assoc}'(a, \mathit{pred}(x))}
+  \infer1{(\exists y\ldotp \mathit{Assoc}'(y, x)) =
+    (\exists y\ldotp \mathit{Assoc}(y, x) \lor
+    \mathit{Assoc}'(y, \mathit{pred}(x)))}
+  \infer1{(\exists y\ldotp \mathit{Assoc}'(y, x)) =
+    ((\exists y\ldotp \mathit{Assoc}(y, x)) \lor
+    (\exists y\ldotp \mathit{Assoc}'(y, \mathit{pred}(x))))}
+  \infer1{\text{T}'(x) = \text{T}(x) \lor \text{T}'(\mathit{pred}(x))}
+\end{prooftree}
+
+The existential introduction reflects the fact that the transformation
+only cares about the \textemph{existence} of any term on the tonal
+tier that is associated with the input term.
 
 
 Strictly local logical tranductions, as shown thus far, satisfy both
