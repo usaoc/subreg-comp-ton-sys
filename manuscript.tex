@@ -467,20 +467,21 @@ nonregular relations.\footnote{An example is the first-order definable
   in the class of tree-adjoining languages \parencite{sw94efecg}.}
 Monadic second-order logic allows quantification over sets, which is
 needed for the definition of general precedence \(<\) based on
-immediate precedence \(\vartriangleleft\):
+immediate precedence \(\vartriangleleft\):\footnote{This is to assume
+  the relations are nonrecursive.}
 
 \ex.
-\a. \(\mathit{Closed}(X) \coloneq \forall x, y\ldotp
+\a. \(\mathit{Transitive}(X) \coloneq \forall x, y\ldotp
 (x \in X \land x \vartriangleleft y) \implies y \in X\)
 \b. \(x < y \coloneq \forall X\ldotp
-(x \in X \land \mathit{Closed}(X)) \implies y \in X\)
+(x \in X \land \mathit{Transitive}(X)) \implies y \in X\)
 
 This is understood as \enquote{\(x\) precedes \(y\) iff every
-  transitive closure of immediate precedence that includes \(x\) also
-  includes \(y\)}, which means the minimal one of such transitive
-closures also includes \(y\).  A relation is then defined that
-expresses that an \(a\) immediately precedes another \(a\) ignoring
-other non-\(a\)s between them:
+  transitive set with respect to immediate precedence that includes
+  \(x\) also includes \(y\)}, which means the transitive closure also
+includes \(y\).  A relation is then defined that expresses that an
+\(a\) immediately precedes another \(a\) ignoring other non-\(a\)s
+between them:
 
 \ex. \(x \vartriangleleft_{a} y \coloneq a(x) \land a(y) \land x < y
 \land \neg(\exists z\ldotp a(z) \land x < z \land z < y)\)
