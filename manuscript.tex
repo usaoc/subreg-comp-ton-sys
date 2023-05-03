@@ -27,6 +27,7 @@
 \usepackage{linguex}
 
 \onehalfspacing
+\setlength{\jot}{0pt}
 \setlist{noitemsep}
 \titleformat{\chapter}{\normalfont\huge\bfseries}{\thechapter}{1em}{}
 \titlespacing*{\chapter}{
@@ -54,12 +55,18 @@
 \newcommand{\context}{\mathrel{/}}
 \newcommand{\cuhk}{The Chinese University of Hong Kong}
 \newcommand{\gap}{\underline{\hspace{1em}}}
+\newcommand{\shift}{\hspace*{1em}}
 \newcommand{\textemph}[1]{\textsc{#1}}
+\newcommand{\textfeat}[1]{\textsc{#1}}
+\newcommand{\textfor}[1]{\textit{#1}}
+\newcommand{\textform}[1]{\textit{#1}}
+\newcommand{\textgls}[1]{`#1'}
 \newcommand{\textphon}[1]{[#1]}
 \newcommand{\textterm}[1]{\textsc{#1}\index{#1}}
 
 \renewcommand{\implies}{\Rightarrow}
 \renewcommand{\ExLBr}{(\thechapter.}
+\renewenvironment{flushleft}{\raggedright}{}
 
 \begin{document}
 \pagenumbering{alph}
@@ -83,7 +90,7 @@
 
     \bigskip
 
-    A Thesis To Be Submitted in Partial Fulfilment of
+    A Thesis Submitted in Partial Fulfilment of
 
     the Requirement for the Degree of
 
@@ -97,7 +104,7 @@
 
     \cuhk
 
-    \monthyyyy\formatdate{28}{12}{2022}
+    \monthyyyy\formatdate{08}{05}{2023}
   \end{center}
   \pretocmd{\doclicenseLongText}{%
     Copyright \copyright\ 2023 Wing Hei Chan\par}{}{}
@@ -685,6 +692,1751 @@ the study of computational complexity.  Potentially, it relates to the
 more difficult problem of the interfaces between linguistic levels.  A
 complete answer to this question requires a better understanding of
 the primitives and operations each level allows.
+
+\chapter{Boundary of Transformation}
+With the computational preliminaries in place, we are now ready to
+analyze the attested tonal transformations found in Chinese languages.
+This chapter specifically discusses transformations involving
+boundaries that can block the applications.  Despite the simple facets
+of transformations \textfor{per se}, the existence of boundaries
+raises certain important questions, such as where, when, and how they
+come into play.  This is especially problematic under linear models,
+as hierarchical interpretations of boundaries often require more than
+linear sequences.
+
+\section{Representation of Boundary}
+The linear understanding of \textterm{boundaries} is simply certain
+terms that never surface, yet block any transformation that may
+otherwise apply.  A boundary term is always output \textemph{as is},
+therefore failing to satisfy any condition when it precedes or
+succeeds the input term in question.  Consider again the unbounded
+tone spreading rule:
+
+\ex. \(\acute{\sigma}'(x) \coloneq \acute{\sigma}(x) \lor
+(\sigma(x) \land \acute{\sigma}'(\mathit{pred}(x)))\)
+
+A boundary term certainly cannot satisfy \(\sigma(x)\), and thus
+\(\acute{\sigma}'(\mathit{pred}(x))\) cannot be true when it precedes
+the input term.  This quickly fails to account for more complicated
+rule interactions, where boundaries may \textemph{change} to create
+new contexts.  Recall that cyclicity assumes that each cycle creates
+new contexts until fixed point---this intuition leads to analyses that
+delete and insert new boundaries.
+
+An alternative view of boundaries is \textterm{groupings}, which can
+render the transformation nonregular.  Even if we ignore this nature
+of arbitrary groupings by restricting self-embedding in some manner,
+there is still the issue of determining whether two terms are in the
+same group.  Suppose groupings are delimited by conventional brackets,
+to determine whether two terms are in the same group, the transducer
+potentially needs to traverse the whole input sequence.  This is more
+apparent in the case of autosegmental representations, where groupings
+are represented as represented as trees, which are a subset of
+directed graphs.\footnote{Such trees with a limited depth are known as
+  \enquote{prosodic hierarchy}, for which see \textcite{nv86pp}.} The
+relation that decides whether two terms are in the same group is then
+
+\ex. \(\mathit{SameGroup}(x, y) \coloneq \exists z\ldotp
+\mathit{Assoc}(z, x) \land \mathit{Assoc}(z, y)\)
+
+assuming that groupings do not nest.  As usual, nestable groupings
+require the transitive closure of \(\mathit{Assoc}\), which is monadic
+second-order definable.
+
+If we entirely discard the idea of explicitly encoding boundaries in
+input sequences, we need to derive the same processes as before,
+thereby implicitly encoding boundaries in some sense.  What boundary
+terms achieve is essentially applying a single transformation to
+multiple linear sequences and combining the outputs through some
+associative operation, say concatenation.  In other words, the
+transformation is \enquote{lifted} to operate on multiple linear
+sequences.  By doing so, we modularize the transformation into a
+simpler transformation and a universal lift operation.\footnote{This
+  operation is precisely a functor, or loosely speaking function of
+  type
+  \((\alpha \to \beta) \to \mathbb{F}\alpha \to \mathbb{F}\beta\),
+  commonly known as \(\mathit{map}\).  \(\mathbb{F}\) should produce a
+  type whose values can be \enquote{folded} in the sense of
+  \textcite{h99tuem} under a monoid.}
+
+However, groupings are much different, as they create input
+\textemph{trees}.  Input trees, by their inductive nature, can contain
+more trees, which are in turn input trees to a potentially new
+transducer with appropriate hierarchical notions encoded.  It not only
+generates a recursive process, but also creates a leaky abstraction as
+the transducer must be aware of the whole input up to a certain level.
+This defeats the purpose of having multiple linguistic levels in the
+first place.
+
+The ideal scenario is that each linguistic level drives phonological
+realization by feeding the next level inputs and combining the
+outputs.  This eliminates the need of boundaries altogether, while
+implicitly preserving their essence.  This is also much what cyclicity
+really aims to achieve, namely that each cycle further transforms the
+input sequence with one layer of groupings removed.  What this means
+in practice will be demonstrated in the following sections as relevant
+linguistic data are covered.
+
+\section{Standard Chinese: Tone 3 Sandhi}
+Tone 3 sandhi is a tonal transformation found in Standard Chinese,
+where tone 3 is dissimilated to tone 2 before another tone 3.  This
+process can be described as simultaneously applied, as seen in the
+following data:
+
+\ex.
+\a. \(\text{\textform{zhǎnlǎn}} \to
+\text{\textform{zhánlǎn} \textgls{exhibit}}\)
+\b. \(\text{\textform{zhǎnlǎnguǎn}} \to
+\text{\textform{zhánlánguǎn} \textgls{exhibition hall}}\)
+\b. \(\text{\textform{zhǎnlǎnguǎn lǐ}} \to
+\text{\textform{zhánlánguán lǐ} \textgls{in exhibition hall}}\)
+
+Therefore, a logical transduction
+
+\ex. \(\acute{\sigma}'(x) \coloneq \acute{\sigma}(x) \lor
+(\check{\sigma}(x) \land \check{\sigma}(\mathit{succ}(x)))\)
+
+resulting in the mapping
+
+\ex. \(\check{\sigma}^{n+1} \to \acute{\sigma}^{n}\check{\sigma}\)
+
+should be enough to describe the process.  It should be emphasized
+that this process is linear in its computational nature,
+\textemph{regardless} of the specific representation used here for
+convenience.  Indeed, even if the tones are represented on a separate
+tier with multiple terms, the transformation is still linear and,
+importantly, strictly local, albeit with a larger memory
+size.\footnote{To decide the memory size, it suffices to calculate the
+  number \(n + m\), where \(n\) and \(m\) are respectively the highest
+  degrees of composition of the predecessor and successor functions in
+  the normalized transduction.}  Namely, the mapping will then be
+
+\ex. \((\text{LL})^{n+1} \to (\text{LR})^{n}\text{LL}\)
+
+ignoring the optional alternative realization of tone 3 when it is
+lengthened \parencite{d99mstems}.  The fundamental reason is that the
+associations are not affected by the transformation, that is,
+\(\mathit{Assoc}\) is never mentioned in the transduction.
+
+The transformation becomes more interesting when boundaries are
+concerned.  The data
+
+\ex.
+\a. \(\text{\textform{gǒu bǐ mǎ xiǎo}} \to
+\text{\textform{góu bǐ má xiǎo}}\)
+\bg. gǒu bǐ mǎ xiǎo\\
+dog than horse small\\
+\trans\textgls{Dogs are smaller than horses.}
+
+show that certain tone 3 does \textemph{not} change to tone 2.  This
+seems to suggest that an alternative transduction
+
+\ex. \(\acute{\sigma}'(x) \coloneq \acute{\sigma}(x) \lor
+(\check{\sigma}(x) \land \check{\sigma}'(\mathit{succ}(x)))\)
+
+resulting in the mapping
+
+\ex.
+\a. \(\check{\sigma}^{2n} \to (\acute{\sigma}\check{\sigma})^{n}\)
+\b. \(\check{\sigma}^{2n+1} \to
+\check{\sigma} (\acute{\sigma}\check{\sigma})^{n}\)
+
+is in effect.  This is not true, as the data
+
+\ex.
+\a. \(\text{\textform{xiǎogǒu bǐ xiǎomǎ xiǎo}} \to
+\text{\textform{xiáogóu bǐ xiáomá xiǎo}}\)
+\bg. xiǎo-gǒu bǐ xiǎo-mǎ xiǎo\\
+small-dog than small-horse small\\
+\trans\textgls{Puppies are smaller than ponies.}
+
+clearly do not adhere to the mapping.  Moreover, the data
+
+\ex.
+\a. \(\text{\textform{xiǎo zhǐlǎohǔ}} \to
+\{\text{\textform{xiǎo zhíláohǔ}},
+\text{\textform{xiáo zhǐláohǔ}},
+\text{\textform{xiáo zhíláohǔ}}\}\)
+\bg. xiǎo zhǐ-lǎohǔ\\
+small paper-tiger\\
+\trans\textgls{small paper tiger}
+
+show that certain tone 3 \textemph{optionally} changes to tone 2.  To
+account for such contrasts, various analyses have been developed.  Two
+such analyses, where one is representative for \enquote{syntactic}
+analyses, and the other for \enquote{prosodic} analyses, will be
+discussed.
+
+\subsection{Syntactic Analysis}
+\textcite{c00tspcd} argues for a analysis under which feet are built
+based on syntactic structures, which in turn govern the application of
+tone 3 sandhi.  As \textcite{d07psc} states, Although this analysis
+includes a notion of feet, they are nonetheless not related to prosody
+given their insensitivity to stress.  More crucially, the tone 3
+sandhi rule makes reference to the syntactic structure when it is
+optional.  Therefore, it is considered a \enquote{syntactic} analysis
+here.
+
+The basic idea is that syntactic branching leads to different foot
+structures.  For example, a left branching syntactic structure leads
+to a left foot:
+
+\ex.
+\a. \(\text{(\textform{mǎi hǎo}) \textform{jiǔ}} \to
+\text{(\textform{mái háo}) \textform{jiǔ}}\)
+\bg. [[mǎi hǎo] jiǔ]\\
+\phantom{[[}buy good wine\\
+\trans\textgls{to finish buying wine}
+
+Tone 3 sandhi applies to \textform{mǎi} as it is followed by another
+tone 3 syllable in the same foot.  The curious part is \textform{hǎo},
+which is followed by another tone 3 syllable in a \textemph{higher}
+group.  A right branching syntactic structure, on the other hand,
+leads to a right foot:
+
+\ex.
+\a. \(\text{\textform{mǎi} (\textform{hǎo jiǔ})} \to
+\{\text{\textform{mǎi} (\textform{háo jiǔ})},
+\text{\textform{mái} (\textform{háo jiǔ})}\}\)
+\bg. [mǎi [hǎo jiǔ]]\\
+\phantom{[}buy \phantom{[}good wine\\
+\trans\textgls{to buy good wine}
+
+Tone 3 sandhi now only optionally applies to \textform{mǎi}, as it is
+followed by another tone 3 syllable in a \textemph{lower} group.
+Apparently, this implies that nestable groupings are required.  As
+aforementioned, nestable groupings lead to monadic second-order logic
+over \textemph{trees}, which is an undesirable property.
+
+Alternatively, we may consider that the trees be transformed to linear
+sequences suitable as inputs to the later level.  This can be a simple
+recursive process that flattens the input trees using an associative
+operation that prefixes boundaries.\footnote{This process can also be
+  represented as a strictly local tree transducer, given that linear
+  sequences are isomorphic to single-pathed graphs, that is,
+  unary-branching trees.  See \textcite{ioj20qtt, jh20isltt} for
+  detailed discussions of such transducers.}  This tree transformation
+can be nondeterministic to account for the optionality, but the level
+it feeds, tone 3 sandhi, remains deterministic.\footnote{Under
+  nondeterminism, an output sequence that contains a
+  \(\check{\sigma}\check{\sigma}\) substring simply fails and
+  backtracks.  Although \textcite{c00tspcd} reports several data that
+  contain such substrings, they are more likely due to emphatic
+  stresses.}  Considering only the nontrivial cases, we have
+
+\ex.
+\a. \(
+\begin{forest}
+  nice empty nodes,
+  [[\(v\), baseline] [[\(w\)] [\(z\)]]]
+\end{forest}
+\to
+\#v\#wz\)
+\b. \(
+\begin{forest}
+  nice empty nodes,
+  [[[\(v\)] [\(w\)]] [\(z\), baseline]]
+\end{forest}
+\to
+\#\#vwz\)
+
+
+In some sense, this is as if only opening brackets were preserved.
+Syntactic categories are insignificant, as the process only makes
+reference to the hierarchical structure.  This, of course, still
+requires modification to tone 3 sandhi, as now the input sequences
+contain boundaries.  To completely suppress boundaries in the inputs,
+we can further split linear sequences by boundaries, resulting in
+multiple linear sequences.\footnote{Or, obviously, transform to
+  multiple linear sequences in a single pass.  The presentation is
+  merely for easier understanding under a graph-transduction
+  perspective.}  Tone 3 sandhi is then lifted to operate on these
+linear sequences, whose outputs are combined by concatenation.  To put
+it simply, this means that
+
+\ex.
+\a. \(\#v\#wz \to \tau(v) \cdot \tau(w \cdot z)\)
+\b. \(\#\#vwz \to \tau(v \cdot w \cdot z)\)
+
+omitting empty sequences.  Interestingly, the contrast now comes from
+the fact that tone 3 sandhi does not preserve concatenation:
+
+\ex. \(\neg(\forall x, y\ldotp
+\tau(x \cdot y) = \tau(x) \cdot \tau(y))\)
+
+If this \textemph{did} hold, we would be able to derive the
+equivalence of the two mappings due to associativity.
+
+A note should be made regarding cyclicity.  In \posscite{c00tspcd}
+original analysis, cyclicity is used to explain both simultaneous and
+optional applications, on the assumption that groupings can be
+expanded at each level.  However, we have seen how cyclicity is
+\textemph{not} an essential property of the analysis by virtue of
+modularization, where a tree transformation feeds tone 3 sandhi.
+
+\subsection{Prosodic Analysis}
+\textcite{d07psc} proposes an alternative analysis in light of several
+perceived inadequacies of the previous syntactic analysis.  The most
+significant one is that supposedly same syntactic structures can lead
+to different groupings, as
+
+\ex. \(\text{(\textform{něizhǒng}) (\textform{jiǔ hǎo})} \to
+\text{(\textform{néizhǒng}) (\textform{jiú hǎo})}\)
+
+must be derived from
+
+\exg. [[[něi-zhǒng] jiǔ] hǎo]\\
+\phantom{[[[}which-kind alcoholic.beverage good\\
+\trans\textgls{Which kind of alcoholic beverage is good?}
+
+supposing the syntactic structure is correct at all.  This obviously
+hinges on specific syntactic analysis, as one can imagine
+
+\exg. [[[něi-zhǒng] [\gap{} jiǔ]] hǎo]\\
+\phantom{[[[}which-kind \phantom{[}\textfeat{gap} alcoholic.beverage
+good\\
+\trans\textgls{Which kind of alcoholic beverage is good?}
+
+being a totally valid alternative analysis that \textemph{does} derive
+the correct grouping.\footnote{Justification for a similar analysis
+  based on type shifting can be found in \textcite{bs14cnl}, which
+  generalizes to all determiners.}  With the addition of gap terms,
+the tree transformation requires more elaboration, but this does not
+change the computational nature of the linear transformation.
+Similarly, some other provided data can arguably be attributed to
+alternative syntactic analyses.
+
+Another perceived inadequacy is the insensitivity to stresses, which
+is the reason behind the name \enquote{stress-insensitive foot}.  For
+example, an emphatic stress as in
+
+\ex. \(\text{\textform{xiǎng} (\textform{MǍI gǔpiào})} \to
+\text{\textform{xiǎng} (\textform{MÁI gǔpiào})}\)
+
+seems to favor (force?) a boundary before the emphasized syllable.
+Again, this only requires modification to the tree transformation.
+Nonetheless, \textcite{d07psc} opts for a more aggressive modification
+to both the tree transformation and tone 3 sandhi.
+
+Under the proposal, syntactic trees are assigned stresses according to
+the \enquote{information-stress principle}, which covers syntactic
+structures assuming that nonheads carry more information.  The
+syllables are then grouped into feet based on stresses, where a
+stressed syllable must starts a group.  As these feet are considered
+metrical due to the relevance of stresses, the analysis is a prosodic
+one.
+
+The complication is that tone 3 sandhi must be aware of
+\textemph{both} the syntactic structure and prosodic groupings due to
+the way \enquote{adjacency} is defined.  Two syllables are said to be
+\enquote{adjacent} when they are contained by the same syntactic
+constituent and not by separate full feet, where a full foot is a
+grouping with more than one syllable.  This notion must be defined
+over autosegmental representations:
+
+\ex.
+\a. \(\mathit{Adjacent}(x, y) \coloneq \mathit{SameConst}(x, y) \land
+\neg\mathit{SepFullFeet}(x, y)\)
+\b. \(\mathit{SameConst}(x, y) \coloneq \exists z\ldotp
+\mathit{Dom}(z, x) \land \mathit{Dom}(z, y)\)
+\b. \(\mathit{SepFullFeet}(x, y) \coloneq \exists z, w\ldotp
+z \neq w \land \mathit{FullFeet}(z, x) \land \mathit{FullFeet}(w, y)\)
+\b. \(\mathit{FullFeet}(x, y) \coloneq \mathit{Feet}(x, y) \land
+(\exists z\ldotp \mathit{Feet}(x, z) \land
+(\mathit{prec}(y) = z \lor \mathit{succ}(y) = z))\)
+
+\(\mathit{Dom}\) is the transitive closure of the syntactic
+association relation, and \(\mathit{Feet}\) is the prosodic
+association relation.  This is overcomplicated as a phonological
+process, at least from our point of view.
+
+Moreover, tone 3 sandhi is now said to be a nondeterministic process,
+which optionally changes tone 3 before nonadjacent or sandhi tone 3.
+In a logical world, this can be achieved by an operator that
+introduces choice points, say \posscite{m61bmtcpr} \(\mathit{amb}\)
+operator:
+
+\ex.
+\a. \(\acute{\sigma}'(x) \coloneq \acute{\sigma}(x) \lor
+(\check{\sigma}(x) \land \check{\sigma}(\mathit{succ}(x))
+\land \neg\mathit{MaybeSkip}(x))\)
+\b. \(\mathit{MaybeSkip}(x) \coloneq
+\mathit{amb}(\neg\mathit{Adjacent}(x, \mathit{succ}(x)),
+\check{\sigma}(\mathit{succ}(\mathit{succ}(x))), \bot)\)
+
+We see how convoluted the analysis becomes once the phonological
+process is no longer subregular.  Even though tone 3 sandhi is a one
+of the simplest phonological processes, the \textemph{condition} it
+applies heavily depends on syntactic information.  Still worse, its
+application can be nondeterministic.  By distributing the workload to
+tone 3 sandhi, its computational nature is effectively obscured.
+Moreover, using autosegmental representations to represent
+\textemph{hierarchical} structures is in some sense an abuse.
+
+\section{Tianjin Mandarin: Rule Interaction}
+Tianjin Mandarin is a more interesting case than Standard Chinese, as
+there are a total of \textemph{three} tone sandhi rules that interact
+in a nontrivial way.  In Tianjin Mandarin, three dissimilation rules
+similar to tone 3 sandhi in Standard Chinese are found:\footnote{For
+  convenience, notations borrowed from Hanyu Pinyin are used to
+  indicate the tones, although they do not phonologically correspond
+  to the specific tones in Standard Chinese.}
+
+\ex.
+\a. \(\grave{\sigma}\grave{\sigma} \to \check{\sigma}\grave{\sigma}\)
+\hfill(F[alling-]F sandhi)
+\b. \(\check{\sigma}\check{\sigma} \to \acute{\sigma}\check{\sigma}\)
+\hfill(L[ow-]L sandhi)
+\b. \(\acute{\sigma}\acute{\sigma} \to \bar{\sigma}\acute{\sigma}\)
+\hfill(R[ising-]R sandhi)
+
+These rules approximately generalize to trisyllabic sequences in a
+manner reminiscent of directionalities:
+
+\ex.
+\a. \(\grave{\sigma}\grave{\sigma}\grave{\sigma} \to
+\grave{\sigma}\check{\sigma}\grave{\sigma}\)
+\hfill(right-to-left)
+\b. \(\check{\sigma}\check{\sigma}\check{\sigma} \to
+\check{\sigma}\acute{\sigma}\check{\sigma}\)
+\hfill(right-to-left)
+\b. \(\acute{\sigma}\acute{\sigma}\acute{\sigma} \to
+\bar{\sigma}\bar{\sigma}\acute{\sigma}\)
+\hfill(left-to-right)
+
+
+There has been debates on how these rules interact and, by extension,
+how to explain such interactions.  Rule-based analyses such as
+\posscite{t87tstd, z87ptal} proposals rely on stipulations to account
+for the directionalities as well as the feeding relations, therefore
+offering no real explanation.  In the subregular zoo, instead of
+directionalities, the difference in patterns amounts to the difference
+in logical formulae, that is, the computational nature of the rules.
+The problem is then how to also accommodate the feeding relations.  A
+relevant \enquote{boundaryless} computational analysis will be
+discussed before a new \enquote{boundaryful} analysis is presented.
+
+\subsection{Bounadaryless Analysis}
+\posscite{c18catsi} analysis is based on the observation that the
+three strictly local functions can be combined into a single one,
+which must remember a pair of input and output substrings.  It is thus
+an input-output strictly local function.  Following our convention so
+far, the idea will be described using logical formulae instead of
+transducers.  The logical transduction, without consideration of the
+feeding relations, is as follows:
+
+\ex.
+\a. \(\check{\sigma}'(x) \coloneq
+(\check{\sigma}(x) \land \neg\check{\sigma}'(\mathit{succ}(x))) \lor
+(\grave{\sigma}(x) \land \grave{\sigma}'(\mathit{succ}(x)))\)
+\b. \(\acute{\sigma}'(x) \coloneq
+(\acute{\sigma}(x) \land \neg\acute{\sigma}(\mathit{succ}(x))) \lor
+(\check{\sigma}(x) \land \check{\sigma}'(\mathit{succ}(x)))\)
+\b. \(\bar{\sigma}'(x) \coloneq \bar{\sigma}(x) \lor
+(\acute{\sigma}(x) \land \acute{\sigma}(\mathit{succ}(x)))\)
+
+In the transduction, rule interactions are naturally derived from the
+shapes of logical formulae.  We see that FF sandhi feeds LL sandhi
+given the presence of \(\check{\sigma}'\), and similarly that LL
+sandhi counterfeeds RR sandhi given the absence of
+\(\acute{\sigma}'\).  A redefinition of the transduction gives us
+another possibility:
+
+\ex.
+\a. \(\check{\sigma}'(x) \coloneq
+(\check{\sigma}(x) \land
+\neg\check{\sigma}^{\land}(\mathit{succ}(x))) \lor
+(\grave{\sigma}(x) \land \grave{\sigma}'(\mathit{succ}(x)))\)
+\b. \(\acute{\sigma}'(x) \coloneq
+(\acute{\sigma}(x) \land
+\neg\acute{\sigma}^{\lor}(\mathit{succ}(x))) \lor
+(\check{\sigma}(x) \land \check{\sigma}^{\land}(\mathit{succ}(x)))\)
+\b. \(\bar{\sigma}'(x) \coloneq \bar{\sigma}(x) \lor
+(\acute{\sigma}(x) \land
+\acute{\sigma}^{\lor}(\mathit{succ}(x)))\)
+\b. \(\check{\sigma}^{\land}(x) \coloneq
+\check{\sigma}(x) \land \check{\sigma}'(x)\)
+\b. \(\acute{\sigma}^{\lor}(x) \coloneq
+\acute{\sigma}(x) \lor \acute{\sigma}'(x)\)
+
+FF sandhi now counterfeeds LL sandhi given the presence of
+\(\check{\sigma}^{\land}\), that is, a sandhi low tone does
+\textemph{not} trigger LL sandhi.  Likewise, LL sandhi now feeds RR
+sandhi given the presence of \(\acute{\sigma}^{\lor}\), that is, a
+rising tone either in the input or output sequence triggers RR sandhi.
+
+
+This analysis apparently does not make reference to boundaries, unlike
+our analysis of tone 3 sandhi in Standard Chinese.  This leads a
+difficulty in describing the conflicting data:
+
+\ex. \(\check{\sigma}\grave{\sigma}\grave{\sigma} \to
+\{\check{\sigma}\check{\sigma}\grave{\sigma},
+\acute{\sigma}\check{\sigma}\grave{\sigma}\}\)
+
+The former alternative suggests that FF sandhi counterfeeds LL sandhi,
+while the latter suggests otherwise:
+
+\ex.
+\a. \(\check{\sigma}\grave{\sigma}\grave{\sigma} \to
+\check{\sigma}\check{\sigma}\grave{\sigma}\)
+\b. \(\check{\sigma}\grave{\sigma}\grave{\sigma} \to
+\check{\sigma}\check{\sigma}\grave{\sigma} \to
+\acute{\sigma}\check{\sigma}\grave{\sigma}\)
+
+The presence of the extra step of application is exactly what
+differentiates counterfeeding and feeding, at least given the lack of
+boundaries.  Unfortunately, we can encode either counterfeeding or
+feeding, but not both.  The contrast of the two, nonetheless, is
+analogous to the situation in Standard Chinese.  Indeed, the following
+holds assuming FF sandhi feeds LL sandhi:
+
+\ex.
+\a. \(\tau(\check{\sigma}) \cdot \tau(\grave{\sigma}\grave{\sigma}) =
+\check{\sigma}\check{\sigma}\grave{\sigma}\)
+\b. \(\tau(\check{\sigma}\grave{\sigma}\grave{\sigma}) =
+\acute{\sigma}\check{\sigma}\grave{\sigma}\)
+
+\subsection{Boundaryful Analysis}
+The data shown in \textcite{t87tstd} are actually subject to a clear
+contrast between left-branching and right-branching structures, which
+we now know derive different boundaries.  The most trivial case of
+boundaries is found when every syllable is emphatically stressed, thus
+creating the sequence
+
+\ex. \(v\#w\#z\)
+
+that does not undergo any sandhi.  This happens since a single
+syllable can not be affected by the transduction, namely that
+
+\ex. \(\tau(v) \cdot \tau(w) \cdot \tau(z) = vwz\)
+
+This is not particularly interesting, but does show that boundaries
+are in effect.  This case is henceforth ignored for lack of interest.
+
+The more interesting cases are found when some syllables do undergo
+sandhi.  In these cases, Tianjin Mandarin uses a more
+\enquote{conservative} approach to creating boundaries, such that
+every constituent receives a prefix and suffix boundary when
+flattened.  This leads to the tree transformation
+
+\ex.
+\a. \(
+\begin{forest}
+  nice empty nodes,
+  [[\(v\), baseline] [[\(w\)] [\(z\)]]]
+\end{forest}
+\to
+\#v\#wz\#\#\)
+\b. \(
+\begin{forest}
+  nice empty nodes,
+  [[[\(v\)] [\(w\)]] [\(z\), baseline]]
+\end{forest}
+\to
+\#\#vw\#z\#\)
+
+that appears as if every bracket is rewritten into a boundary term.
+In other words, a left-branching structure causes the substring of
+first two syllables to undergo tone sandhi, while a right-branching
+structure causes the substring of last two syllables to undergo tone
+sanhi, when boundaries are outputted at all.
+
+As usual, the tree transformation is nondeterministic, so that
+boundaries are allowed to be omitted.  With this in mind, it is still
+true that the patterns that are attested for \textemph{both}
+left-branching and right-branching structures can be used to justify
+the trisyllabic generalization, as these patterns occur when
+boundaries are omitted.  The transduction therefore remains strictly
+local, while the originally conflicting data can now be well
+explained:
+
+\ex. \(\check{\sigma}(\grave{\sigma}\grave{\sigma}) \to
+\{\check{\sigma}\#\check{\sigma}\grave{\sigma},
+\acute{\sigma}\check{\sigma}\grave{\sigma}\}\)
+
+
+Applying this idea to more data shows that it is indeed the right
+track.  The cases of trisyllabic sequences are shown first, as these
+cases do not involve the complication of feeding relations:
+
+\ex.
+\a. \(\check{\sigma}(\check{\sigma}\check{\sigma}) \to
+\{\check{\sigma}\#\acute{\sigma}\check{\sigma},
+\check{\sigma}\acute{\sigma}\check{\sigma}\}\)
+\b. \((\check{\sigma}\check{\sigma})\check{\sigma} \to
+\{\acute{\sigma}\check{\sigma}\#\check{\sigma},
+\check{\sigma}\acute{\sigma}\check{\sigma}\}\)
+\b. \(\acute{\sigma}(\acute{\sigma}\acute{\sigma}) \to
+\{\acute{\sigma}\#\bar{\sigma}\acute{\sigma},
+\bar{\sigma}\bar{\sigma}\acute{\sigma}\}\)
+\b. \((\acute{\sigma}\acute{\sigma})\acute{\sigma} \to
+\{\bar{\sigma}\acute{\sigma}\#\acute{\sigma},
+\bar{\sigma}\bar{\sigma}\acute{\sigma}\}\)
+
+The FF sandhi data also suggest a minor modification to the
+transduction to accommodate the rule
+
+\ex. \(\grave{\sigma}\check{\sigma} \to \bar{\sigma}\check{\sigma}\)
+\hfill(FL sandhi)
+
+that produces the following mappings:
+
+\ex.
+\a. \(\grave{\sigma}\grave{\sigma}\grave{\sigma} \to
+\bar{\sigma}\check{\sigma}\grave{\sigma}\)
+\b. \(\grave{\sigma}\grave{\sigma}\check{\sigma} \to
+\check{\sigma}\bar{\sigma}\check{\sigma}\)
+
+This can be done by redefining the logical transduction:
+
+\ex.
+\a. \(\check{\sigma}'(x) \coloneq
+(\check{\sigma}(x) \land
+\neg\check{\sigma}^{\land}(\mathit{succ}(x))) \lor
+(\grave{\sigma}(x) \land
+\grave{\sigma}(\mathit{succ}(x)) \land
+\neg\check{\sigma}'(\mathit{succ}(x)))\)
+\b. \(\bar{\sigma}'(x) \coloneq \bar{\sigma}(x) \lor
+(\acute{\sigma}(x) \land
+\acute{\sigma}^{\lor}(\mathit{succ}(x))) \lor
+(\grave{\sigma}(x) \land
+\check{\sigma}'(\mathit{succ}(x)))\)
+
+The interaction is a curious one, as now FF sandhi feeds FL sandhi
+\textemph{while} counterbled by it.  This is rather complicated to
+describe with cyclicity, but simple enough as a strictly local
+function.  Correct patterns of FF sandhi can now be predicted:
+
+\ex.
+\a. \(\grave{\sigma}(\grave{\sigma}\grave{\sigma}) \to
+\{\grave{\sigma}\#\check{\sigma}\grave{\sigma},
+\bar{\sigma}\check{\sigma}\grave{\sigma}\}\)
+\b. \((\grave{\sigma}\grave{\sigma})\grave{\sigma} \to
+\{\check{\sigma}\grave{\sigma}\#\grave{\sigma},
+\bar{\sigma}\check{\sigma}\grave{\sigma}\}\)
+
+To decide the feeding relations, data involving rule interactions are
+examined.  LL sandhi bleeds FL sandhi:
+
+\ex.
+\a. \(\grave{\sigma}(\check{\sigma}\check{\sigma}) \to
+\{\grave{\sigma}\#\acute{\sigma}\check{\sigma},
+\grave{\sigma}\acute{\sigma}\check{\sigma}\}\)
+\b. \((\grave{\sigma}\check{\sigma})\check{\sigma} \to
+\{\bar{\sigma}\check{\sigma}\#\check{\sigma},
+\grave{\sigma}\acute{\sigma}\check{\sigma}\}\)
+
+FL sandhi counterbleeds FF sandhi:
+
+\ex.
+\a. \(\grave{\sigma}(\grave{\sigma}\check{\sigma}) \to
+\{\grave{\sigma}\#\bar{\sigma}\check{\sigma},
+\check{\sigma}\bar{\sigma}\check{\sigma}\}\)
+\b. \((\grave{\sigma}\grave{\sigma})\check{\sigma} \to
+\{\check{\sigma}\grave{\sigma}\#\check{\sigma},
+\check{\sigma}\bar{\sigma}\check{\sigma}\}\)
+
+LL sandhi feeds RR sandhi:
+
+\ex.
+\a. \(\acute{\sigma}(\check{\sigma}\check{\sigma}) \to
+\{\acute{\sigma}\#\acute{\sigma}\check{\sigma},
+\bar{\sigma}\acute{\sigma}\check{\sigma}\}\)
+\b. \((\acute{\sigma}\check{\sigma})\check{\sigma} \to
+\{\acute{\sigma}\check{\sigma}\#\check{\sigma},
+\bar{\sigma}\acute{\sigma}\check{\sigma}\}\)
+
+FF sandhi feeds LL sandhi:
+
+\ex.
+\a. \(\check{\sigma}(\grave{\sigma}\grave{\sigma}) \to
+\{\check{\sigma}\#\check{\sigma}\grave{\sigma},
+\acute{\sigma}\check{\sigma}\grave{\sigma}\}\)
+\b. \((\check{\sigma}\grave{\sigma})\grave{\sigma} \to
+\{\check{\sigma}\grave{\sigma}\#\grave{\sigma},
+\acute{\sigma}\check{\sigma}\grave{\sigma}\}\)
+
+All that remains is a transduction that is compatible with all cases,
+which can be defined using the shown techniques.
+
+
+Lastly, some rare cases in the data seem to suggest that LL sandhi
+produces the alternative mapping:
+
+\ex. \(\check{\sigma}\check{\sigma}\check{\sigma} \to
+\acute{\sigma}\acute{\sigma}\check{\sigma}\)
+
+As previously discussed, adding alternatives to the transduction
+incurs nondeterminism.  Instead, it is more likely that some lexical
+items with a low tone have alternative realizations with a rising
+tone, moving nondeterminism out from the transduction.\footnote{This
+  can also explain the mapping
+  \(\check{\sigma}\grave{\sigma}\grave{\sigma} \to
+  \acute{\sigma}\check{\sigma}\grave{\sigma}\) even if counterfeeding
+  is assumed.}
+
+\section{Interim Summary}
+This section has argued for a modular analysis of tonal transformation
+that is sensitive to the hierarchical structure.  The point is not to
+suggest that a certain analysis is inherently better than another.
+Rather, it argues that such a modular analysis is computationally
+feasible and clarifies the boundaries between linguistic levels.  Even
+if the overall complexity of the composed system remains the same, a
+modular analysis allows for the local reasoning of each module due to
+abstraction and encapsulation.  This is also why modularization is
+heavily studied in programming language theory.
+
+Specifically, a boundary-based analysis is presented for both Standard
+Chinese and Tianjin Mandarin, where a boundary is merely a term that
+blocks the transformation.  In this sense, the whole transformation
+can be understood as a boundary-agnostic subtransformation
+\enquote{lifted} to operate on multiple linear sequences that are
+produced by splitting the input sequence by boundaries.  This is how we
+achieve modularity---by further and further separating out each step
+of computation and composing them together at the end.
+
+The theoretical implication is that the methodological assumption of
+lexical phonology or any modular approach in general is preferable.
+Nonetheless, this does not and should not bear any substantive
+implication.  Nothing is assumed about the \enquote{architecture of
+  the language faculty}, as this issue is simply not important in the
+computational understanding of phonology.  We agree with lexical
+phonology insomuch as both are opposed to the cyclic and thus
+monolithic view of phonology.  Anything more is left aside.
+
+\chapter{Power of Representation}
+In the previous chapter, we have had a taste of how representations
+can obscure the computational nature.  This chapter relates this
+intuition to even more attested tonal transformations.
+Representations are indispensable both as a theoretical tool and
+metatheoretical notion, and they often enforce specific ways to
+express the computation.  Choosing an incorrect representation can
+either overly simplify or complicate the computation, much to our
+dismay.
+
+\section{Representation as Computation}
+Representations, when considered as a part of bigger computation,
+implicitly \textterm{encode} partially or fully done computation.
+This is not new to linguists, as syntacticians often face the
+dichotomy between features and constraints, whose equivalence is
+pointed out in \textcite{g17cgdfc}.  The contentious issue of enriched
+representations has also been a long-standing problem in theoretical
+phonology.
+
+Most significantly, choosing an unintuitive representation can lead to
+a seemingly simplified computation, at the expense of a more complex
+conversion from the intuitive representation.  A famous example is how
+\posscite{d72lcnndtafmact} notation highly simplifies substitution in
+\(\lambda\)-calculi by eliminating variable shadowing, despite the
+fact that the conversion from a conventional notation requires taking
+care of exactly that!  As another example, recall the unattested
+transformation that rewrites \(a\) depending on the evenness of its
+number.  Suppose the representation encodes this information by
+splitting \(a\) into \(\acute{a}\) and \(\grave{a}\), with the
+following constraints:
+
+\ex.
+\a. \(\acute{a}(x) \implies (\forall y\ldotp x < y \implies
+\neg\grave{a}(y))\)
+\b. \((\acute{a}(x) \land
+(\neg\exists y\ldotp x \vartriangleleft_{a} y))
+\implies \mathit{Odd}(x)\)
+\b. \(\grave{a}(x) \implies (\forall y\ldotp x < y \implies
+\neg\acute{a}(y))\)
+\b. \((\grave{a}(x) \land
+(\neg\exists y\ldotp x \vartriangleleft_{a} y))
+\implies \mathit{Even}(x)\)
+
+The transformation then simply rewrites all \(\acute{a}\)s to \(a\)s
+and all \(\grave{a}\)s to \(b\)s.  All is well, except now the
+representation not only encodes the evenness information, but also
+renders many sequences invalid.  It is only reasonable when it serves
+as an \textemph{intermediate} representation that encodes the decision
+of the evenness.  Even then, the decision would have had the same
+computational complexity as before anyway.
+
+More surprisingly, representations can also complicate the
+computation, in particular when the structures are unsuited for the
+problem domain.  The familiar issue of cyclicity is precisely one
+example, as it essentially leads to a hierarchical structure in
+phonology.  This hierarchical structure, in turn, creates the
+important question of conditions of application, which is one of the
+reasons regular models were adopted in \textcite{kk94rmprs}.
+Conversely, the fact that arbitrary term rewriting generates
+recursively enumerable languages as proved by \textcite{pr73gptg}
+suggests that a more principled \enquote{movement} theory is required,
+ideally based on hierarchical structures.  Nowadays, variants of
+categorial grammars such as combinatory categorial grammars in
+\textcite{s00sp} are adopted.
+
+The mention of categorial grammars relates to a fundamental issue in
+our metatheory.  Our metatheory is inherently a logical one, partially
+due to its ease of understanding, but more so due to the equational
+reasoning provided by logical calculi.  A \textterm{calculus}, in
+essence, is a theory of the equivalence between representations,
+defined \enquote{up to} some relations.  By studying the calculus
+directly or indirectly, we gain a better understanding of the
+essential properties in the formalisms, in contrast to idiosyncratic
+artifacts of our metalanguage.  For example, \(\lambda\)-terms that
+differ only in bound variable names are equivalent up to
+\(\alpha\)-equivalance, suggesting that names should not matter.  In
+the case of subregular functions, the logical transductions are their
+defining property, as opposed to the theoretically inspired
+representations.
+
+\section{Shanghai Wu: Tone Spreading}
+Shanghai Wu has a tonal transformation traditionally known as
+\enquote{left dominance}, properly named so after the fact that the
+leftmost syllable decides the tonal pattern of the whole group.
+Detailed theoretical discussions can be found in \textcite{d93rlsad,
+  d99mstems} among others.  This tonal transformation is particularly
+relevant as it is often analyzed as an \textemph{autosegmental}
+phenomenon, despite its almost linear nature.
+
+Intuitively, the idea is that the first term on the tonal tier is
+always associated with the first syllable, while the second term is
+associated with either the first or second syllable depending on
+whether the latter is present.  The remaining syllables, if any,
+remain unassociated with any term and are thus \enquote{toneless}.
+This gives us the following mappings:
+
+\ex.
+\a. \(
+\begin{forest}
+  auto, [\(\sigma\) [T, no edge] [T, no edge]]
+\end{forest}
+\to
+\begin{forest}
+  auto, [\(\sigma\) [T] [T]]
+\end{forest}\)
+\b. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge]]
+  [\(\sigma\) [T, no edge]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T]]
+  [\(\sigma\) [T]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}\)
+
+
+It is worth it to ask whether autosegmental representations are really
+needed.  For example, it is not apparent why the excessive terms on
+the tonal tier should be present at all if they always end up unused
+by the transformation.  The problem is that the tonal status of a
+specific syllable is always tied to the association relation, forcing
+us to retreat to this unnecessary indirection and obscuring the nature
+of left dominance.
+
+To demonstrate the effects of this theoretical assumption of
+autosegmental representations, an autosegmental analysis proposed by
+\textcite{z20eaislfmdft} will be discussed, followed by our linear
+analysis.  As we will see, there is little to no reason to assume
+autosegmental representations, at least in the case of Shanghai Wu.
+It is in some sense overly generalized, contra the spirit of pinning
+down the exact computational complexity, as well as creating the
+problem of normalized representations.
+
+\subsection{Autosegmental Analysis}
+\posscite{z20eaislfmdft} analysis is a \enquote{port} of the
+theoretical analysis to the computational land.  It is argued that
+left dominance \textemph{cannot} be a linear transformation based on
+the assumption that a contour tone consists of multiple tonal terms.
+Indeed, a hypothetical linear transformation involving \(n\) tonal
+terms seems to require a memory size of \(n\), as
+
+\ex. \(\text{T}_{1}\text{T}_{2}\ldots\text{T}_{n-1}.\text{T}_{n} \to
+\text{T}_{1}.\text{T}_{2}\)
+
+must remember \(\text{T}_{2}\) up to \(\text{T}_{n}\), crossing the
+syllabic boundary.  This assumption, of course, deserves further
+questioning.  Regardless, the proposed analysis defines the
+transduction as
+
+\ex.
+\(\mathit{Assoc}'(x, y) \coloneq
+\begin{aligned}[t]
+  & (\mathit{First}(x) \land \mathit{First}(y) \land
+    \mathit{Assoc}(x, y)) \lor \mbox{}\\
+  &\shift (\mathit{Second}(x) \land \mathit{Second}(y) \land
+    \mathit{Assoc}(x, \mathit{pred}(y)))
+\end{aligned}\)
+
+where \(\mathit{First}\) and \(\mathit{Second}\) are predicates that
+test whether the term is the \enquote{first} or \enquote{second} term.
+They can be defined as follows assuming left dominance applies to
+\(\#\)-separated units:
+
+\ex.
+\a. \(\mathit{First}(x) \coloneq \#(\mathit{pred}(x))\)
+\b. \(\mathit{Second}(x) \coloneq
+\neg\#(\mathit{pred}(x)) \land \#(\mathit{pred}(\mathit{pred}(x)))\)
+
+Similarly, a predicate \(\mathit{Last}\) that tests whether the term
+is the \enquote{last} term can be defined, which will become useful
+later:
+
+\ex. \(\mathit{Last}(x) \coloneq \#(\mathit{succ}(x))\)
+
+
+This transduction does not generate the exact mapping we are looking
+for.  Instead, it generates
+
+\ex. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\(\sigma\) [T, name=tsnd, no edge]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T]]
+  [\(\sigma\) [T]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}\)
+
+This undesirably imposes a further assumption of the
+\enquote{underlying} association, even though it never surfaces in
+this specific mapping.  Supposedly, the assumption is made to account
+for the trivial case of monosyllabic sequences, where the mapping is
+
+\ex. \(
+\begin{forest}
+  auto,
+  [\(\sigma\) [T] [T]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [\(\sigma\) [T] [T]]
+\end{forest}\)
+
+that is, an identity map.  The transduction, however, does not reflect
+this intuition of \enquote{citation} forms, as
+
+\ex. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\phantom{\(\sigma\)} [T, name=tsnd, no edge]]
+  [\phantom{\(\sigma\)} [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\phantom{\(\sigma\)} [T, name=tsnd, no edge]]
+  [\phantom{\(\sigma\)} [\(\text{T}\ldots\), no edge]]]
+\end{forest}\)
+
+does not preserve the underlying association.
+
+Upon further examination, \(\mathit{Assoc}\) appears to be unnecessary
+in the transduction.  A redefinition of the transduction can drop the
+reference to it, as the surface association merely depends on the
+\textemph{positions} of the terms:
+
+\ex.
+\a. \(\mathit{Assoc}'(x, y) \coloneq
+(\mathit{First}(x) \land \mathit{First}(y)) \lor
+(\mathit{Second}(x) \land
+(\mathit{Only}(y) \lor \mathit{Second}(y)))\)
+\b. \(\mathit{Only}(x) \coloneq
+\mathit{First}(x) \land \mathit{Last}(x)\)
+
+This transduction directly corresponds to the theoretical analysis and
+assumes nothing about the underlying association.  This gives rise to
+the question whether the \enquote{garbage} tonal terms are retained in
+the surface forms, if a normalization procedure is in effect.
+Intuitively, the surface forms should always be normalized to encode
+the \textemph{least} information as possible.  Such normalization can
+be achieved by tailoring the domain predicate that decides whether or
+not a term is copied:\footnote{And, accordingly, the predecessor and
+  successor functions are adjusted to the domain.}
+
+\ex. \(\mathit{Copy}(x) \coloneq \neg\text{T}(x) \lor
+\mathit{First}(x) \lor \mathit{Second}(x)\)
+
+
+Another more serious problem is that this transformation misses the
+\textform{yángrù} pattern.  This pattern occurs when the first
+syllable both starts with a voiced onset (\enquote{\textform{yáng}})
+and ends with a stop coda (\enquote{\textform{rù}}), and is much
+different from the above pattern:
+
+\ex. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge]]
+  [\(\sigma\ldots\)]
+  [\(\sigma\) [T, no edge]]
+  [\phantom{\(\sigma\)} [\(\text{T}\ldots\), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, name=tfst]]
+  [\(\sigma\ldots\), name=ssnd]
+  [\(\sigma\), name=slst [T]]
+  [\phantom{\(\sigma\)} [\(\text{T}\ldots\), no edge]]]
+  \draw (tfst.north) -- (ssnd.south west);
+  \draw (tfst.north) -- (slst.south);
+\end{forest}\)
+
+This transformation requires a recursive definition:
+
+\ex. \(
+\mathit{Assoc}'(x, y) \coloneq
+(\mathit{First}(x) \land \mathit{First}(y)) \lor \mbox{}
+\mathit{Assoc}'(x, \mathit{pred}(y)) \lor \mbox{}
+(\mathit{Second}(x) \land \mathit{Last}(y))\)
+
+Intuitively, it spreads the first tonal term to all syllables and
+associates the second tonal term to the last syllable.
+
+The combination of the two transformations is more involved, but not
+impossible.\footnote{Alternatively, the \textform{yángrù} pattern is
+  simply subject to a separate transformation.  This is not
+  implausible given that some speakers only use the pattern for
+  disyllabic and trisyllabic sequences.} Observe the following
+implication in all surface patterns:
+
+\ex. \((\mathit{Second}(x) \land
+\mathit{Last}(y) \land
+\mathit{Assoc}'(\mathit{pred}(x), y)) \implies
+\mathit{Assoc}'(x, y)\)
+
+This implication subsumes the use of \(\mathit{Only}\), since
+
+\ex. \(\mathit{Only}(x)
+\implies \mathit{First}(x)
+\implies \exists y\ldotp
+(\mathit{First}(y) \land \mathit{Assoc}'(y, x))\)
+
+Moreover, a way to limit the spreading to the \textform{yángrù}
+pattern is needed.  This can be simply done by splitting the spreading
+into two parts, where the first part associates the first tonal term
+to the second syllable, and the second part further spreads the first
+tonal term.  This way, a check can be added to both parts.  Therefore,
+the combined transformation is
+
+\ex. \(
+\begin{aligned}[t]
+  &\mathit{Assoc}'(x, y) \coloneq \mbox{}\\
+  &\shift (\mathit{First}(x) \land \mathit{First}(y)) \lor \mbox{}\\
+  &\shift (\mathit{First}(x) \land
+    \mathit{Second}(y) \land
+    \mathit{Yángrù}(\mathit{pred}(y))) \lor \mbox{}\\
+  &\shift (\mathit{Assoc}'(x, \mathit{pred}(y)) \land
+    \mathit{Assoc}'(x, \mathit{pred}(\mathit{pred}(y)))) \lor
+    \mbox{}\\
+  &\shift (\mathit{Second}(x) \land \mbox{}\\
+  &\shift\shift ((\mathit{Second}(y) \land
+    \neg\mathit{Yángrù}(\mathit{pred}(y))) \lor
+    (\mathit{Last}(y) \land \mathit{Assoc}'(\mathit{pred}(x), y))))
+\end{aligned}\)
+
+\subsection{Linear Analysis}
+At this point, it is worth it to revisit the linear transformation.
+As we notice, there are only \textemph{two} possible configurations in
+the non-\textform{yángrù} pattern.  This results in a correspondence
+to the previously assumed linear representations:
+
+\ex.
+\a. \(
+\begin{forest}
+  auto,
+  [\(\sigma\) [T] [T]]
+\end{forest}
+\implies
+\text{TT}\)
+\b. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T]]
+  [\(\sigma\) [T]]
+  [\(\sigma\ldots\)]]
+\end{forest}
+\implies
+\text{T}.\text{T}\)
+
+In this sense, syllabic boundaries are \textemph{not} needed in the
+inputs at all, as they can be created by another transformation:
+
+\ex.
+\a. \(.'(x) \coloneq \mathit{Second}(x) \land \neg\mathit{Last}(x)\)
+\b. \(\text{T}'(x) \coloneq \mathit{First}(x) \lor
+\mathit{Last}(x) \lor
+\mathit{Second}(\mathit{pred}(x))\)
+
+Unfortunately, the \textform{yángrù} pattern does not show an apparent
+correspondence to linear representations of this kind.  The major
+problem is that the use of syllabic boundary above is not for
+delimiting units, but rather as a \enquote{diacritic} to mark the
+alternative configuration.  This falls down for the \textform{yángrù}
+pattern, as there are now \(n\) configurations where
+\(n \in \mathbb{N}\), echoing with the original argument against
+linear transformation.
+
+Alternatively, we can resort to a strictly one-to-one association
+between syllables and tones, that is, marking the tones on the
+syllables.  In fact, the tonal patterns in Shanghai Wu are limited to
+these four types, where the first two types are accounted for by the
+classical analysis of left dominance:\footnote{Tones are indicated as
+  in the International Phonetic Alphabet.}
+
+\ex.
+\a. \(\{\hat{\sigma}, \acute{\sigma}\grave{\sigma}\sigma\ldots\}\)
+\hfill(\textform{yīnpíng})
+\b. \(\{\check{\sigma},
+\grave{\sigma}\acute{\sigma}\sigma\ldots\}\)
+\hfill(\textform{shǎngqùshēng})
+\b. \(\{\acute{\sigma},
+\grave{\sigma}\acute{\sigma}\sigma\ldots\}\)
+\hfill(\textform{yīnrù})
+\b. \(\{\check{\sigma},
+\grave{\sigma}\grave{\sigma}\ldots\check{\sigma}\}\)
+\hfill(\textform{yángrù})
+
+First, consider a linear transformation that accounts for the
+non-\textform{yángrù} patterns.  Following the intuition that the
+monosyllabic sequences reflect some sort of \enquote{citation} forms,
+the tones are left unchanged when they are on the only syllables:
+
+\ex.
+\a. \(\hat{\sigma}'(x) \coloneq
+\mathit{Only}(x) \land \hat{\sigma}(x)\)
+\b. \(\check{\sigma}'(x) \coloneq
+\mathit{Only}(x) \land \check{\sigma}(x)\)
+
+In polysyllabic cases, the first two syllables have their tones
+decided by the first syllable:
+
+\ex.
+\a. \(
+\begin{aligned}[t]
+  & \acute{\sigma}'(x) \coloneq \mbox{}\\
+  &\shift (\mathit{Only}(x) \land \acute{\sigma}(x)) \lor \mbox{}\\
+  &\shift (\mathit{FirstNonLast}(x) \land
+    \hat{\sigma}(x)) \lor \mbox{}\\
+  &\shift (\mathit{Second}(x) \land
+    (\check{\sigma}(\mathit{pred}(x)) \lor
+    \acute{\sigma}(\mathit{pred}(x))))
+\end{aligned}\)
+\b. \(\grave{\sigma}'(x) \coloneq
+(\mathit{FirstNonLast}(x) \land
+(\check{\sigma}(x) \lor \acute{\sigma}(x))) \lor
+(\mathit{Second}(x) \land \hat{\sigma}(\mathit{pred}(x)))\)
+\b. \(\mathit{FirstNonLast}(x) \coloneq
+\mathit{First}(x) \land \neg\mathit{Last}(x)\)
+
+The remaining syllables are assigned neutral tones:
+
+\ex. \(\sigma'(x) \coloneq
+\neg(\mathit{First}(x) \lor \mathit{Second}(x))\)
+
+
+The above transformation, like its autosegmental counterpart, is
+nonrecursive.  However, the \textform{yángrù} pattern still requires a
+recursive definition, given that it is characteristically an unbounded
+tone spreading rule:
+
+\ex.
+\a. \(\grave{\sigma}'(x) \coloneq
+\mathit{FirstNonLast}(x) \lor
+(\neg\mathit{Last}(x) \land \grave{\sigma}'(\mathit{pred}(x)))\)
+\b. \(\check{\sigma}'(x) \coloneq \mathit{Last}(x)\)
+
+The combination of the two transformations, again, requires the
+distinction between the \textform{yángrù} pattern and
+non-\textform{yángrù} patterns.  The same technique can be adapted to
+the linear transformation, with the caveat that tone spreading applies
+up to the \textemph{penultimate} syllable.  The resulting transduction
+is as follows, omitting predicates that carry their original
+definitions:\footnote{For convenience, \textform{yángrù} is assumed to
+  be a unique tone in the inputs, although such an assumption does not
+  otherwise change the overall complexity.}
+
+\ex.
+\a. \(
+\begin{aligned}[t]
+  & \check{\sigma}'(x) \coloneq \mbox{}\\
+  &\shift (\mathit{Only}(x) \land
+    (\check{\sigma}(x) \lor \mathit{Yángrù}(x))) \lor \mbox{}\\
+  &\shift (\mathit{Last}(x) \land \mbox{}\\
+  &\shift\shift ((\mathit{Second}(x) \land
+    \mathit{Yángrù}(\mathit{pred}(x))) \lor
+    (\grave{\sigma}'(\mathit{pred}(x)) \land
+    \grave{\sigma}'(\mathit{pred}(\mathit{pred}(x))))))
+\end{aligned}\)
+\b. \(
+\begin{aligned}[t]
+  & \grave{\sigma}'(x) \coloneq \mbox{}\\
+  &\shift (\mathit{FirstNonLast}(x) \land
+    (\check{\sigma}(x) \lor
+    \acute{\sigma}(x) \lor
+    \mathit{Yángrù}(x))) \lor \mbox{}\\
+  &\shift (\mathit{Second}(x) \land
+    \hat{\sigma}(\mathit{pred}(x))) \lor \mbox{}\\
+  &\shift (\neg\mathit{Last}(x) \land \mbox{}\\
+  &\shift\shift ((\mathit{Second}(x) \land
+    \mathit{Yángrù}(\mathit{pred}(x))) \lor
+    (\grave{\sigma}'(\mathit{pred}(x)) \land
+    \grave{\sigma}'(\mathit{pred}(\mathit{pred}(x))))))
+\end{aligned}\)
+\b. \(\sigma'(x) \coloneq \neg(
+\mathit{First}(x) \lor
+\mathit{Second}(x) \lor
+(\grave{\sigma}'(\mathit{pred}(x)) \land
+\grave{\sigma}'(\mathit{pred}(\mathit{pred}(x)))))\)
+
+The last predicate reflects the fact that neutral tones only surface
+after a \enquote{contour} formed by the first two syllables.
+
+The combined linear transformation surprisingly resembles its
+autosegmental counterpart to some degree, except that more concrete
+tonal representations are used.  This is not a coincidence, but merely
+a result of the general idea of left dominance.  An implementation of
+this idea necessarily involves the distinction between
+\textform{yángrù} and non-\textform{yángrù}, as well as that between
+monosyllabic and polysyllabic.
+
+On the other hand, the autosegmental transformation is an
+\textemph{overgeneralization}.  It is in some sense not a tonal
+transformation, but an \enquote{association transformation}, since it
+does not assume anything about the tonal terms.  There is therefore
+nothing stopping, say, \(\grave{\sigma}\grave{\sigma}\sigma\ldots\)
+from being a valid surface pattern given \(\text{LLT}\ldots\) on the
+tonal tier, while the linear transformation does not acknowledge the
+\(\grave{\sigma}\) predicate at all.  Normalization is also not a
+problem in the linear transformation, as each tone is strictly marked
+on each syllable, whereas the autosegmental transformation does not
+care much beyond the association relation.
+
+\section{Suzhou Wu: Exceptional Pattern}
+Suzhou Wu is similar to Shanghai Wu in that left dominance patterns
+can be found in some heavy-initial sequences, where \enquote{heavy}
+refers to syllables that do not end with a stop coda.  Following
+\posscite{z20qffselts, z23maltssw} theoretical analysis, there are
+five types for such syllables:
+
+\ex.
+\a. ti\textsuperscript{HH} \textgls{low}
+\hfill(\textform{yīnpíng})
+\b. di\textsuperscript{LH} \textgls{carry}
+\hfill(\textform{yángpíng})
+\b. ti\textsuperscript{HL} \textgls{bottom}
+\hfill(\textform{yīnshǎng})
+\b. ti\textsuperscript{HLH} \textgls{emperor}
+\hfill(\textform{yīnqù})
+\b. di\textsuperscript{LHL} \textgls{ground}
+\hfill(\textform{yángshǎngqù})
+
+Specifically, \textform{yángpíng}- and \textform{yángshǎngqù}-initial
+sequences show an obvious pattern of left dominance as in the
+autosegmental mapping:
+
+\ex. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [L, no edge]]
+  [\(\sigma\) [H, no edge]]
+  [\phantom{(}\(\sigma\ldots\) [(L), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [L]]
+  [\(\sigma\) [H]]
+  [\phantom{(}\(\sigma\ldots\) [(L), no edge]]]
+\end{forest}\)
+
+The same mapping applies to \textform{yīnpíng}-initial sequences
+assuming that the mapping is only sensitive to the associations.
+However, \textform{yīnshǎng}-initial sequences undergo a different
+mapping where the first syllable always bears the same tone:
+
+\ex. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [H, no edge]]
+  [\(\sigma\) [L, no edge]]
+  [\(\sigma\ldots\)]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [H]]
+  [\(\sigma\) [L, no edge, name=tsnd]]
+  [\(\sigma\ldots\)]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}\)
+
+The second syllable can be assumed to either associate with the second
+tonal term or remain unassociated.  Either way, it surfaces with a low
+tone.
+
+To account for the contrast between left-dominant and
+\enquote{exceptional} patterns, a proposal based on the idea of
+\enquote{floating tones} has been introduced.  Basically, the
+transformation must now be sensitive to the underlying association
+such that only the unassociated tonal terms are subject to the
+left-dominant mapping.  By doing so, the transformation is able to
+produce both mappings:
+
+\ex.
+\a. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge]]
+  [\(\sigma\) [T, no edge]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T]]
+  [\(\sigma\) [T]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}\)
+\b. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}\)
+
+It is therefore natural to ask how such a transformation can be
+computationally implemented.  A relevant computational analysis found
+in \textcite{z20eaislfmdft} will be discussed and criticized due to
+its mischaracterization of the computational complexity, contrasted
+with our analysis.  The idea of \enquote{diacritical} features will be
+mentioned and justified.
+
+\subsection{Morphemic Analysis}
+\posscite{z20eaislfmdft} analysis of Suzhou is a \enquote{morphemic}
+analysis in the sense that it involves the addition of an extra
+morphemic tier on top of the existing segmental and tonal tiers.  As a
+result, \textform{yángpíng} and \textform{yīnshǎng} syllables are
+represented as
+
+\ex.
+\a.
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline
+  [L, no edge [\(\mathit{Mor}\), name=mfst]]
+  [H, no edge, name=tsnd]]]
+  \draw (mfst.north) -- (tsnd.south);
+\end{forest}
+\b.
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline
+  [H [\(\mathit{Mor}\), name=mfst]]
+  [L, name=tsnd]]]
+  \draw (mfst.north) -- (tsnd.south);
+\end{forest}
+
+Curiously, the morphemic association relation
+\(\mathit{Rel}_{\mathit{Mor}}\) serves no apparent purpose in the
+transduction.  Indeed, the transduction is defined as
+
+\ex. \(
+\begin{aligned}[t]
+  & \mathit{Assoc}'(x, y) \coloneq \mbox{}\\
+  &\shift ((\mathit{Assoc}(x, y) \lor \mathit{First}(x)) \land
+    \mathit{First}(y)) \lor \mbox{}\\
+  &\shift (\neg\mathit{Assoc}(x, \mathit{pred}(y)) \land
+    (\exists z\ldotp
+    \mathit{Rel}_{\mathit{Mor}}(z, y) \land \mathit{First}(z)) \land
+    \mathit{Second}(x) \land \mathit{Second}(y))
+\end{aligned}\)
+
+where \(\mathit{Rel}_{\mathit{Mor}}\) causes the unfortunate presence
+of existential quantification.  In \textcite{z20eaislfmdft}, this
+existential quantification is left out from the transduction,
+resulting in the mischaracterization of it as strictly local.  This
+cannot be true as the transduction must be logically closed, while the
+removal of the existential quantification leads to a free variable.
+Regardless, this transduction produces the following mappings:
+
+\ex.
+\a. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge [\(\mathit{Mor}\), name=mfst]]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (mfst.north) -- (tsnd.south);
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T [\(\mathit{Mor}\), name=mfst]]]
+  [\(\sigma\) [T, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (mfst.north) -- (tsnd.south);
+\end{forest}\)
+\b. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T [\(\mathit{Mor}\), name=mfst]]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (mfst.north) -- (tsnd.south);
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T [\(\mathit{Mor}\), name=mfst]]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (mfst.north) -- (tsnd.south);
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}\)
+
+
+As a last resort, we can consider how to preserve the intuition of the
+transduction while removing the unnecessary assumptions.  An immediate
+notice to make is that the addition of \(\mathit{Rel}_{\mathit{Mor}}\)
+contributes nothing to the transduction whatsoever.  It is introduced
+purely on a theoretical basis, much like what we have seen in Shanghai
+Wu.  Crucially, it disambiguates the cases where a floating tone can
+be either from the first or second syllable:
+
+\ex.
+\a.
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T [\(\mathit{Mor}\), name=mfst]]]
+  [\phantom{\sigma} [T, no edge, name=tsnd]]
+  [\(\sigma\) [T [\(\mathit{Mor}\)]]]]]
+  \draw (mfst.north) -- (tsnd.south);
+\end{forest}
+\b.
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T [\(\mathit{Mor}\)]]]
+  [\phantom{\sigma} [T, no edge, name=tsnd]]
+  [\(\sigma\) [T [\(\mathit{Mor}\), name=msnd]]]]]
+  \draw (msnd.north) -- (tsnd.south);
+\end{forest}
+
+Nonetheless, there is the possibility that such a distinction is
+simply \textemph{unfeasible}, given that existential quantification is
+needed to make use of the morphemic information.  In fact, it is
+rather reminiscent of the problem of grouping discussed above.  At the
+very least, this scenario does not appear in Suzhou Wu, not even when
+\enquote{light}-initial sequences are concerned, although they will
+not be the focus here.
+
+Another problem is that the transduction is forced to assume that the
+second tonal term for exceptional patterns must always be underlyingly
+associated with the first syllable.  This assumption is acceptable as
+a phonotactic condition, but it does raise the question whether it can
+be dropped.  Overall, the modified transduction is defined as
+
+\ex. \(
+\begin{aligned}[t]
+  & \mathit{Assoc}'(x, y) \coloneq \mbox{}\\
+  &\shift ((\mathit{Assoc}(x, y) \lor \mathit{First}(x)) \land
+    \mathit{First}(y)) \lor \mbox{}\\
+  &\shift (\neg\mathit{Assoc}(x, \mathit{pred}(y)) \land
+    \mathit{Second}(x) \land \mathit{Second}(y))
+\end{aligned}\)
+
+with the mere removal of \(\mathit{Rel}_{\mathit{Mor}}\).  Further
+adjustments for monosyllabic patterns are omitted, but they are easy
+enough to figure out with a similar technique to that used for
+Shanghai Wu.  This produces the very same mappings except without the
+morphemic tier:
+
+\ex.
+\a. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T]]
+  [\(\sigma\) [T, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}\)
+\b. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\(\sigma\) [T, no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}\)
+
+\subsection{Diacritical Analysis}
+As remarked above, the morphemic analysis still makes an indispensable
+assumption about the underlying association even after the removal of
+the morphemic association.  This assumption can be removed at the
+expense of introducing \enquote{diacritical} features, where the
+second tonal term is associated with the first or second syllable
+depending on the diacritic.  In other words, the following two
+mappings are desired:
+
+\ex.
+\a. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge]]
+  [\(\sigma\) [\(\text{T}^{2}\), no edge]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T]]
+  [\(\sigma\) [\(\text{T}^{2}\)]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}\)
+\b. \(
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline [T, no edge]]
+  [\(\sigma\) [\(\text{T}^{1}\), no edge]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+\end{forest}
+\to
+\begin{forest}
+  auto,
+  [, phantom
+  [\(\sigma\), baseline, name=sfst [T]]
+  [\(\sigma\) [\(\text{T}^{1}\), no edge, name=tsnd]]
+  [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
+  \draw (tsnd.north) -- (sfst.south);
+\end{forest}\)
+
+The definition of such a transduction is straightforward:
+
+\ex. \(\mathit{Assoc}'(x, y) \coloneq
+((\text{T}^{1}(x) \lor \mathit{First}(x))
+\land \mathit{First}(y)) \lor
+(\text{T}^{2}(x) \land \mathit{Second}(y))\)
+
+assuming that only the second tonal term bears the diacritical
+features.  Assuming otherwise requires the addition of
+\(\mathit{Second}(x)\), which does not change the overall complexity.
+
+This transduction \textemph{seems} to be simpler.  However, it is
+exactly equivalent to the transduction based on underlying
+association.  To justify this fact, consider that the two diacritical
+features are complementary, that is,
+
+\ex.
+\a. \(\text{T}^{1}(x) = \neg\text{T}^{2}(x)\)
+\b. \(\text{T}^{2}(x) = \neg\text{T}^{1}(x)\)
+
+Viewed this way, it is very much like subcategorization as used in the
+odd--even transformation.  Therefore, an alternative definition for
+our transduction is
+
+\ex. \(\mathit{Assoc}'(x, y) \coloneq
+((\text{T}^{1}(x) \lor \mathit{First}(x))
+\land \mathit{First}(y)) \lor
+(\neg\text{T}^{1}(x) \land \mathit{Second}(y))\)
+
+In some sense, underlying association is an alternative encoding for
+this diacritical feature:
+
+\ex. \(\text{T}^{1}(x) = (\exists y\ldotp \mathit{Assoc}(x, y)) \land
+\mathit{Second}(x)\)
+
+To put it another way, the diacritical feature is \textemph{embedded}
+as underlying association.  This reflects the intuition that
+exceptional patterns only occur when the second tonal term is not a
+floating tone.  The difference is whether such a notion is encoded as
+a predicate or binary relation.  Either way, the previous
+transformation that feeds tone sandhi must be sensitive to the types
+of the first syllable that lead to exceptional patterns.
+
+As we have seen, the many-to-one nature of autosegmental
+representations is unavoidable precisely due to the use of binary
+relations.  Binary relations are convertible to predicates through
+quantification, but doing so essentially creates a surjection, that
+is, many-to-one mapping.  Linear representations, on the other hand,
+avoid the problem altogether due to the lack of binary relations.  Our
+purpose is not arguing for one representation over the other, but
+merely emphasizing the essential properties of each representation.
+
+\section{Interim Summary}
+A recurring debate in theoretical linguistics is the nature of the
+primitives in our theories.  It is often assumed that there is a
+fundamental difference between, say, privative and binary features.
+From a computational point of view, the primitives \textemph{per se}
+are really meaningless, and only their behaviors matter.  In this
+section, the two systems in question are linear and autosegmental
+representations.
+
+Indeed, what makes autosegmental representations special is their
+extra power brought by the association relation, not the fact that
+tonal features can be decomposed into multiple terms.  If the
+autosegmental transformation can be proved to be equivalent to a
+linear transformation, linear representations can as well be used with
+no loss in power.  In particular, autosegmental representations
+require phonotactic constraints to verify the well-formedness, and
+such constraints are very much equivalent to a transformation to
+linear representations.
+
+Ironically, more aggressive theoretical proposals have been proposed
+that decompose segmental features into multiple terms, such as
+\textcite{klv85ispetcg}, but only the autosegmental treatment of tonal
+features is widely accepted.  These autosegmental proposals are all
+subject to the abovementioned problem in that phonotactic constraints
+are required.  In this sense, linear representations simplify the
+computation by implicitly encode these constraints, revolving to our
+original point.
+
+\chapter{Conclusion}
+This chapter summarizes and discusses the findings of this thesis.
+The comparison between the computational and theoretical approaches to
+phonology is presented, followed by future prospects that aim to
+extend on the findings.  See also the interim summaries of the
+previous chapters for the theoretical implications.
+
+\section{Computation vs.\ Theory}
+There is admittedly a gap between computational models and theoretical
+proposals.  Computational phonology, at least the school that this
+thesis is a part of, focuses on characterizing each phonological
+phenomenon in terms of computational devices with as few assumptions
+as possible.  Theoretical phonology, on the other hand, strives for a
+more elegant and unified explanation of each phonological phenomenon.
+This leads to strong, often too strong, assumptions made by
+theoretical proposals.
+
+Is this an irreconcilable conflict between the two approaches?  This
+thesis is obviously not enough to provide a decisive answer to this
+question.  Nonetheless, what we see in the case studies is that the
+intuition of theoretical proposals can often be preserved even if we
+drop some of the assumptions.  This is one of the aims of this thesis,
+that is, to fit the theoretical proposals in the computational world.
+
+To some degree, the computational approach also echoes with the idea
+of \enquote{conspiracy} à la \textcite{k70fupr}.  Optimality theory
+has been successful precisely because it provides a way to derive
+phonological phenomena with few assumptions, namely a constraint
+optimizer parameterized by a set of constraints.  The computational
+approach assumes equally as few, namely a transducer parameterized by
+a set of logical relations or equivalently a set of transitions.
+
+\section{Future Prospect}
+\paragraph{Type Theory}
+Following \posscite{h69fnc} \enquote{formulae-as-types} conception,
+logical formulae correspond to types, and by extension logical calculi
+correspond to type systems.  For example, logical conjunction
+\(p \land q\) corresponds to product types \(\alpha \times \beta\),
+logical disjunction \(p \lor q\) corresponds to sum types
+\(\alpha + \beta\), and logical implication \(p \implies q\)
+corresponds to function types \(\alpha \to \beta\).  Given the heavy
+use of logical formulae in this thesis, one naturally wonders whether
+it can benefit from a type-theoretic characterization of transducers.
+
+A type-theoretical approach can potentially lead to a more structured
+characterization of phonological transformation by enriching the
+types.  At the moment, the input and output types are simply graph
+types, specifically single-pathed graphs in the case of linear
+sequences.  This means that a large subset of graphs are impossible as
+either input or output, resulting in partial functions.  By reflecting
+this fact in the type, we \enquote{make illegal states
+  unrepresentable} as per the catchy slogan, therefore avoiding
+partial functions.
+
+\paragraph{What is Interface?}
+Interface is an often referenced but seldom defined concept.  From a
+computational perspective, an \textterm{interface} defines what
+information can be communicated between two modules.  The two modules
+must interact in such a manner that respects the interface, which
+forces us to clearly state what each module does.  However, we have
+seen that some theoretical proposals entangle morphosyntax and
+phonology, contradicting this understanding of interface.
+
+Recently, advances in theoretical morphology have brought to us
+decompositional theories, such as \posscite{hm93dmpi} distributed
+morphology and \posscite{c09nc} nanosyntax.  A computational study of
+them will hopefully improve our understanding of the
+morphosyntax--phonology interface, especially in contrast to
+process-based theories such as \textcite{a92am}.
+
+\paragraph{Wishful Thinking}
+This thesis adopts a \enquote{wishful thinking} that the logical
+formulae used actually made sense.  Keen-eyed readers will notice that
+some logical formulae are neither input nor recursive strictly local,
+where both the input and recursive predicates use either the
+predecessor or successor function.  This thesis wishes that such
+logical formulae made sense by conjecturing that they correspond to
+input--output strictly local functions.  Whether this is true and how
+this extends to autosegmental representations remain unanswered.
 
 \printbibliography[heading=bibintoc]
 
