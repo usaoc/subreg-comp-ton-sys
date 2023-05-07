@@ -129,7 +129,7 @@ to encode such a phonological transformation that only applies to an
 even number of terms, obviously unattested as an adequate rule.
 
 Recently, studies of the so-called subregular classes, that is,
-classes even weaker than regular relations, have proved a more
+classes even weaker than regular relations, have proved to be a more
 probable upper bound.  Such classes are conceptualized as a hierarchy,
 not unlike the traditional Chomsky hierarchy in formal language
 theory.  The remaining problem is how many phonological phenomena are
@@ -144,15 +144,13 @@ associations.  This process can be carefully separated into two ideas:
 \begin{enumerate}
 \item Tones can be independently represented on a separate tier just
   as segments do;
-\item The associations between phonological tiers interact with tonal
-  transformations in a nontrivial way.
+\item The associations between phonological tiers can be manipulated
+  in a nontrivial way.
 \end{enumerate}
 %
 In this thesis, the two ideas are examined under the lens of attested
 tonal systems found in Chinese languages with vastly different tonal
-transformations.  Computationally, the former is embodied by linear
-strictly local functions, and the latter by autosegmental strictly
-local functions.  Their implication applies not only to tonal systems,
+transformations.  Their implication applies not only to tonal systems,
 but also to the interfaces between linguistic levels in general.
 
 \tableofcontents
@@ -173,12 +171,13 @@ Specifically, the focus is placed on phonological
 Their distinction corresponds to the distinction between transducers
 and acceptors in automata theory, which reflect translation and
 membership problems respectively.  Loosely speaking, a transducer is a
-function of type \(\alpha \to \beta\), while an acceptor is a function
-of type \(\alpha \to \mathit{Boolean}\), that is, a
-predicate.\footnote{Unless a gradient interpretation of phonotactics
-  is required, in which case the output type can be, for example, an
-  interval type.}  The latter will be briefly mentioned as the
-theories are introduced.
+function of type \(\alpha \to \beta \to \mathit{Boolean}\), while an
+acceptor of type \(\alpha \to \mathit{Boolean}\), that is, a
+predicate.\footnote{For deterministic transducers, the types are
+  isomorphic to \(\alpha \to \beta\).}\footnote{Unless a gradient
+  interpretation of phonology is required, in which case the output
+  type can be, for example, an interval type.}  The latter will be
+briefly mentioned as the theories are introduced.
 
 Given the theoretical background, this chapter then explains the
 rationales behind the chosen methodology as well as the expected
@@ -205,9 +204,9 @@ mentioned for its significance in the arguments against cyclicity.
 
 The discussion of \textterm{optimality theory} as in
 \textcite{ps93otcigg} is intentionally omitted.  The reason is not
-that optimality theory is a worse formalism, but merely that the
-formalization of it results in computational devices out of the scope
-of this thesis.  Specifically, optimality theory, due to its
+that optimality theory is a worse formalism, but merely that its
+formalization results in computational devices out of the scope of
+this thesis.  Specifically, optimality theory, due to its
 constraint-optimizing nature, requires constraint optimizers rather
 than transducers, which are potentially powerful enough to
 overgenerate.  For such an implementation based on dynamic
@@ -247,14 +246,13 @@ relations.
 
 Attention should be paid to \enquote{linear}.  One interpretation is
 that phonological transformations apply to a linear sequence of
-segments.  This implies the assumption that segmental phonology, the
-sort that is dealt with above, is disjoint from nonsegmental
-phonology.  This assumption is computationally unsound, as
-nonsegmental phonology does not necessarily require a
-\enquote{nonlinear} account, and conversely segmental phonology may
-require one.  Another interpretation has to do with the notion of
-locality, which is an often misunderstood notion in theoretical
-phonology.
+segments.  This assumes that segmental phonology, the sort that is
+dealt with above, is disjoint from nonsegmental phonology.  This
+assumption is computationally unsound, as nonsegmental phonology does
+not necessarily require a \enquote{nonlinear} account, and conversely
+segmental phonology may require one.  Another interpretation has to do
+with the notion of locality, which is an often misunderstood notion in
+theoretical phonology.
 
 A relevant concern is the representations of tonal features.  Indeed,
 due to the \enquote{linear} nature of the representations, tonal
@@ -275,7 +273,7 @@ representation is a separate matter from the computational complexity
 of the formalism \textemph{independent} of representation.
 
 \subsection{Nonlinear Phonology}
-Despite the remarks given above, nonsegmental phonology is precisely
+Despite the remarks made above, nonsegmental phonology is precisely
 what has inspired the development of nonlinear phonology, also known
 as autosegmental phonology.  Early applications of nonlinear phonology
 can be found in \textcite{c76vhngpam, g76ap}, among others.  Under
@@ -291,7 +289,7 @@ represented as
 
 where \(\sigma\) stands for a syllable and H stands for a high tone.
 Consequently, phonological transformations are generalized to operate
-on associations.  An unbounded tone spreading rule is:
+on associations.  An unbounded tone spreading rule can be given as:
 
 \ex. \(
 \begin{forest}
@@ -306,9 +304,9 @@ on associations.  An unbounded tone spreading rule is:
   auto, [T [\(\sigma\)] [\(\sigma\)] [\(\sigma\)]]
 \end{forest}\)
 
-An implicit assumption of it is that the rule applies iteratively from
-left to right.  This intuition is, surprisingly, captured equally well
-by linear transformations.  An equally acceptable formulation is the
+An implicit assumption is that the rule applies iteratively from left
+to right.  This intuition is, surprisingly, captured equally well by
+linear transformations.  An equally acceptable formulation is the
 linear transformation
 
 \ex. \(\text{T}\varepsilon\varepsilon
@@ -405,18 +403,18 @@ requires recursively rewriting \textterm{nonterminal} terms into
 themselves preceded and followed by other terms.  Formally, a grammar
 is self-embedding iff
 
-\ex. \(\exists A, \varphi, \psi\ldotp A \Rightarrow \varphi A \psi\)
+\ex. \(\exists A, \varphi, \psi\ldotp A \to^{+} \varphi A \psi\)
 
 where neither \(\varphi\) nor \(\psi\) is the identity term and
-\(\Rightarrow\) consists of any number of rewrite steps.  Clearly,
-phonological rules cannot express such a transformation.
+\(\to^{+}\) is the transitive closure of the rewrite relation.
+Clearly, phonology does not permit such a structure.
 \textcite{kk94rmprs} therefore suggests modeling phonological
 transformations as \textterm{regular} relations.
 
 Regular relations are relations whose domains and ranges are regular
 languages.  An artificial regular relation, for example, is a relation
-that rewrites any sequence that has an \textemph{even} number of
-\(a\)s to a sequence with each \(a\) replaced by \(b\).  This is an
+that rewrites any sequence that has an \textemph{even} number of \(a\)
+to a sequence with each \(a\) replaced by \(b\).  This is an
 unattested phonological transformation, but it is a valid regular
 relation, showcasing that regular relations are still computationally
 too complex for modeling phonological transformations.
@@ -469,7 +467,7 @@ These two constraints, in turn, lead to subregular functions.
 
 Alternatively, regular relations can be represented as logical
 transductions, specifically \textterm{monadic second-order} ones as
-those of \textcite{eh01mdsttft}, which are actually able to represent
+those in \textcite{eh01mdsttft}, which are actually able to represent
 nonregular relations.\footnote{An example is the first-order definable
   total reduplication \(w \to ww\), whose output language is included
   in the class of tree-adjoining languages \parencite{sw94efecg}.}
@@ -488,13 +486,13 @@ This is understood as \enquote{\(x\) precedes \(y\) iff every
   transitive set with respect to immediate precedence that includes
   \(x\) also includes \(y\)}, which means the transitive closure also
 includes \(y\).  A relation is then defined that expresses that an
-\(a\) immediately precedes another \(a\) ignoring other non-\(a\)s
+\(a\) immediately precedes another \(a\) ignoring any non-\(a\)
 between them:
 
 \ex. \(x \vartriangleleft_{a} y \coloneq a(x) \land a(y) \land x < y
 \land \neg(\exists z\ldotp a(z) \land x < z \land z < y)\)
 
-The notion of the evenness of the number of \(a\)s is finally defined:
+The notion of the evenness of the number of \(a\) is finally defined:
 
 \ex.
 \a. \(\mathit{Odd}(x) \coloneq (a(x) \land (\forall y\ldotp
@@ -506,7 +504,7 @@ y < x \implies \neg a(y))) \lor (\exists y\ldotp
 Accordingly, the transduction is defined:\footnote{Observant readers
   may notice that an efficient transducer implementing said
   transduction reads the input \textemph{twice}, dispatching on the
-  number of \(a\)s in the first pass.  This is due to the
+  number of \(a\) in the first pass.  This is due to the
   correspondence between monadic second-order logic and two-way
   finite-state transducers.}
 
@@ -550,7 +548,7 @@ thesis, as it lacks a meaningful notion of locality.
 The concept of \textterm{strict locality} is defined for regular
 languages, which concerns the recognition of substrings
 \parencite{rp11apresh, rhfhlw13csc}.  Borrowing this concept, input
-strictly local and output strictly local functions can be defined over
+and output strictly local functions can be defined over
 \textterm{linear} representations, which \enquote{remember} a finite
 length of input and output substrings respectively
 \parencite{ceh14lslsf}.  Similar to subsequential functions, output
@@ -618,7 +616,7 @@ Logical encodings enable the generalization of strict locality over
 \textterm{autosegmental} representations \parencite{cj19aislf}.  Under
 a predicate logic, associations are understood as a binary relation
 \(\mathit{Assoc}\) where \(\mathit{Assoc}(a, b)\) indicates that \(a\)
-and \(b\) are associated, given that \(a\) and \(b\) are on separate
+and \(b\) are associated, where \(a\) and \(b\) are on separate
 tiers.\footnote{A question can be asked whether \(\mathit{Assoc}\) is
   symmetric.  Although this question has no particular bearing,
   \(\mathit{Assoc}\) is assumed to be antisymmetric to allow the
@@ -731,8 +729,8 @@ same group.  Suppose groupings are delimited by conventional brackets,
 to determine whether two terms are in the same group, the transducer
 potentially needs to traverse the whole input sequence.  This is more
 apparent in the case of autosegmental representations, where groupings
-are represented as represented as trees, which are a subset of
-directed graphs.\footnote{Such trees with a limited depth are known as
+are represented as trees, which are a subset of directed
+graphs.\footnote{Such trees with a limited depth are known as
   \enquote{prosodic hierarchy}, for which see \textcite{nv86pp}.} The
 relation that decides whether two terms are in the same group is then
 
@@ -863,9 +861,9 @@ small paper-tiger\\
 
 show that certain tone 3 \textemph{optionally} changes to tone 2.  To
 account for such contrasts, various analyses have been developed.  Two
-such analyses, where one is representative for \enquote{syntactic}
-analyses, and the other for \enquote{prosodic} analyses, will be
-discussed.
+such analyses will be discussed, where one is representative for
+\enquote{syntactic} analyses and the other for \enquote{prosodic}
+analyses.
 
 \subsection{Syntactic Analysis}
 \textcite{c00tspcd} argues for a analysis under which feet are built
@@ -873,9 +871,9 @@ based on syntactic structures, which in turn govern the application of
 tone 3 sandhi.  As \textcite{d07psc} states, Although this analysis
 includes a notion of feet, they are nonetheless not related to prosody
 given their insensitivity to stress.  More crucially, the tone 3
-sandhi rule makes reference to the syntactic structure when it is
-optional.  Therefore, it is considered a \enquote{syntactic} analysis
-here.
+sandhi rule makes reference to the syntactic structure for the
+applicability.  Therefore, it is considered a \enquote{syntactic}
+analysis here.
 
 The basic idea is that syntactic branching leads to different foot
 structures.  For example, a left branching syntactic structure leads
@@ -912,12 +910,12 @@ Alternatively, we may consider that the trees be transformed to linear
 sequences suitable as inputs to the later level.  This can be a simple
 recursive process that flattens the input trees using an associative
 operation that prefixes boundaries.\footnote{This process can also be
-  represented as a strictly local tree transducer, given that linear
-  sequences are isomorphic to single-pathed graphs, that is,
-  unary-branching trees.  See \textcite{ioj20qtt, jh20isltt} for
-  detailed discussions of such transducers.}  This tree transformation
-can be nondeterministic to account for the optionality, but the level
-it feeds, tone 3 sandhi, remains deterministic.\footnote{Under
+  represented as a strictly local tree transducer, as linear sequences
+  are isomorphic to single-pathed graphs, that is, unary-branching
+  trees.  See \textcite{ioj20qtt, jh20isltt} for detailed discussions
+  of such transducers.}  This tree transformation can be
+nondeterministic to account for the optionality, but the level it
+feeds, tone 3 sandhi, remains deterministic.\footnote{Under
   nondeterminism, an output sequence that contains a
   \(\check{\sigma}\check{\sigma}\) substring simply fails and
   backtracks.  Although \textcite{c00tspcd} reports several data that
@@ -1065,8 +1063,8 @@ operator:
 \check{\sigma}(\mathit{succ}(\mathit{succ}(x))), \bot)\)
 
 We see how convoluted the analysis becomes once the phonological
-process is no longer subregular.  Even though tone 3 sandhi is a one
-of the simplest phonological processes, the \textemph{condition} it
+process is no longer subregular.  Even though tone 3 sandhi is one of
+the simplest phonological processes, the \textemph{condition} it
 applies heavily depends on syntactic information.  Still worse, its
 application can be nondeterministic.  By distributing the workload to
 tone 3 sandhi, its computational nature is effectively obscured.
@@ -1101,26 +1099,28 @@ manner reminiscent of directionalities:
 \check{\sigma}\acute{\sigma}\check{\sigma}\)
 \hfill(right-to-left)
 \b. \(\acute{\sigma}\acute{\sigma}\acute{\sigma} \to
+\bar{\sigma}\acute{\sigma}\acute{\sigma} \to
 \bar{\sigma}\bar{\sigma}\acute{\sigma}\)
 \hfill(left-to-right)
 
 
-There has been debates on how these rules interact and, by extension,
-how to explain such interactions.  Rule-based analyses such as
-\posscite{t87tstd, z87ptal} proposals rely on stipulations to account
-for the directionalities as well as the feeding relations, therefore
-offering no real explanation.  In the subregular zoo, instead of
-directionalities, the difference in patterns amounts to the difference
-in logical formulae, that is, the computational nature of the rules.
-The problem is then how to also accommodate the feeding relations.  A
-relevant \enquote{boundaryless} computational analysis will be
-discussed before a new \enquote{boundaryful} analysis is presented.
+There has been debates on how these rules interact and, more
+importantly, how to explain such interactions.  Rule-based analyses
+such as \posscite{t87tstd, z87ptal} proposals rely on stipulations to
+account for the directionalities as well as the feeding relations,
+therefore offering no real explanation.  In the subregular zoo,
+instead of directionalities, the difference in patterns amounts to the
+difference in logical formulae, that is, the computational nature of
+the rules.  The problem is then how to also accommodate the feeding
+relations.  A relevant \enquote{boundaryless} computational analysis
+will be discussed before a new \enquote{boundaryful} analysis is
+presented.
 
 \subsection{Bounadaryless Analysis}
 \posscite{c18catsi} analysis is based on the observation that the
 three strictly local functions can be combined into a single one,
 which must remember a pair of input and output substrings.  It is thus
-an input-output strictly local function.  Following our convention so
+an input--output strictly local function.  Following our convention so
 far, the idea will be described using logical formulae instead of
 transducers.  The logical transduction, without consideration of the
 feeding relations, is as follows:
@@ -1237,19 +1237,18 @@ flattened.  This leads to the tree transformation
 \#\#vw\#z\#\)
 
 that appears as if every bracket is rewritten into a boundary term.
-In other words, a left-branching structure causes the substring of
-first two syllables to undergo tone sandhi, while a right-branching
-structure causes the substring of last two syllables to undergo tone
-sanhi, when boundaries are outputted at all.
+In other words, when boundaries are outputted at all, a left-branching
+structure causes the substring of first two syllables to undergo tone
+sandhi, while a right-branching one does that of last two.  As usual,
+the tree transformation is nondeterministic so that boundaries are
+allowed to be omitted.
 
-As usual, the tree transformation is nondeterministic, so that
-boundaries are allowed to be omitted.  With this in mind, it is still
-true that the patterns that are attested for \textemph{both}
-left-branching and right-branching structures can be used to justify
-the trisyllabic generalization, as these patterns occur when
-boundaries are omitted.  The transduction therefore remains strictly
-local, while the originally conflicting data can now be well
-explained:
+With this in mind, it is still true that the patterns that are
+attested for \textemph{both} left-branching and right-branching
+structures can be used to justify the trisyllabic generalization, as
+these patterns occur when boundaries are omitted.  The transduction
+therefore remains strictly local, while the originally conflicting
+data can now be well explained:
 
 \ex. \(\check{\sigma}(\grave{\sigma}\grave{\sigma}) \to
 \{\check{\sigma}\#\check{\sigma}\grave{\sigma},
@@ -1317,39 +1316,37 @@ function.  Correct patterns of FF sandhi can now be predicted:
 \bar{\sigma}\check{\sigma}\grave{\sigma}\}\)
 
 To decide the feeding relations, data involving rule interactions are
-examined.  LL sandhi bleeds FL sandhi:
+examined:
 
 \ex.
+\a. LL sandhi bleeds FL sandhi
 \a. \(\grave{\sigma}(\check{\sigma}\check{\sigma}) \to
 \{\grave{\sigma}\#\acute{\sigma}\check{\sigma},
 \grave{\sigma}\acute{\sigma}\check{\sigma}\}\)
 \b. \((\grave{\sigma}\check{\sigma})\check{\sigma} \to
 \{\bar{\sigma}\check{\sigma}\#\check{\sigma},
 \grave{\sigma}\acute{\sigma}\check{\sigma}\}\)
-
-FL sandhi counterbleeds FF sandhi:
-
-\ex.
+%
+\z.
+\b. FL sandhi counterbleeds FF sandhi
 \a. \(\grave{\sigma}(\grave{\sigma}\check{\sigma}) \to
 \{\grave{\sigma}\#\bar{\sigma}\check{\sigma},
 \check{\sigma}\bar{\sigma}\check{\sigma}\}\)
 \b. \((\grave{\sigma}\grave{\sigma})\check{\sigma} \to
 \{\check{\sigma}\grave{\sigma}\#\check{\sigma},
 \check{\sigma}\bar{\sigma}\check{\sigma}\}\)
-
-LL sandhi feeds RR sandhi:
-
-\ex.
+%
+\z.
+\b. LL sandhi feeds RR sandhi
 \a. \(\acute{\sigma}(\check{\sigma}\check{\sigma}) \to
 \{\acute{\sigma}\#\acute{\sigma}\check{\sigma},
 \bar{\sigma}\acute{\sigma}\check{\sigma}\}\)
 \b. \((\acute{\sigma}\check{\sigma})\check{\sigma} \to
 \{\acute{\sigma}\check{\sigma}\#\check{\sigma},
 \bar{\sigma}\acute{\sigma}\check{\sigma}\}\)
-
-FF sandhi feeds LL sandhi:
-
-\ex.
+%
+\z.
+\b. FF sandhi feeds LL sandhi
 \a. \(\check{\sigma}(\grave{\sigma}\grave{\sigma}) \to
 \{\check{\sigma}\#\check{\sigma}\grave{\sigma},
 \acute{\sigma}\check{\sigma}\grave{\sigma}\}\)
@@ -1384,8 +1381,7 @@ Rather, it argues that such a modular analysis is computationally
 feasible and clarifies the boundaries between linguistic levels.  Even
 if the overall complexity of the composed system remains the same, a
 modular analysis allows for the local reasoning of each module due to
-abstraction and encapsulation.  This is also why modularization is
-heavily studied in programming language theory.
+abstraction and encapsulation.
 
 Specifically, a boundary-based analysis is presented for both Standard
 Chinese and Tianjin Mandarin, where a boundary is merely a term that
@@ -1448,8 +1444,8 @@ following constraints:
 (\neg\exists y\ldotp x \vartriangleleft_{a} y))
 \implies \mathit{Even}(x)\)
 
-The transformation then simply rewrites all \(\acute{a}\)s to \(a\)s
-and all \(\grave{a}\)s to \(b\)s.  All is well, except now the
+The transformation then simply rewrites each \(\acute{a}\) to \(a\)
+and \(\grave{a}\) to \(b\).  All is well, except now the
 representation not only encodes the evenness information, but also
 renders many sequences invalid.  It is only reasonable when it serves
 as an \textemph{intermediate} representation that encodes the decision
@@ -1531,7 +1527,7 @@ This gives us the following mappings:
 It is worth it to ask whether autosegmental representations are really
 needed.  For example, it is not apparent why the excessive terms on
 the tonal tier should be present at all if they always end up unused
-by the transformation.  The problem is that the tonal status of a
+by the transformation.  A bigger problem is that the tonal status of a
 specific syllable is always tied to the association relation, forcing
 us to retreat to this unnecessary indirection and obscuring the nature
 of left dominance.
@@ -1608,10 +1604,10 @@ for.  Instead, it generates
   [\(\sigma\ldots\) [\(\text{T}\ldots\), no edge]]]
 \end{forest}\)
 
-This undesirably imposes a further assumption of the
-\enquote{underlying} association, even though it never surfaces in
-this specific mapping.  Supposedly, the assumption is made to account
-for the trivial case of monosyllabic sequences, where the mapping is
+This imposes an undesirable assumption of the \enquote{underlying}
+association, even though it never surfaces in this specific mapping.
+Supposedly, the assumption is made to account for the trivial case of
+monosyllabic sequences, where the mapping is
 
 \ex. \(
 \begin{forest}
@@ -1663,7 +1659,7 @@ reference to it, as the surface association merely depends on the
 This transduction directly corresponds to the theoretical analysis and
 assumes nothing about the underlying association.  This gives rise to
 the question whether the \enquote{garbage} tonal terms are retained in
-the surface forms, if a normalization procedure is in effect.
+the surface forms---if a normalization procedure is in effect.
 Intuitively, the surface forms should always be normalized to encode
 the \textemph{least} information as possible.  Such normalization can
 be achieved by tailoring the domain predicate that decides whether or
@@ -1674,7 +1670,7 @@ not a term is copied:\footnote{And, accordingly, the predecessor and
 \mathit{First}(x) \lor \mathit{Second}(x)\)
 
 
-Another more serious problem is that this transformation misses the
+A more severe problem is that this transformation misses the
 \textform{yángrù} pattern.  This pattern occurs when the first
 syllable both starts with a voiced onset (\enquote{\textform{yáng}})
 and ends with a stop coda (\enquote{\textform{rù}}), and is much
@@ -1709,7 +1705,7 @@ This transformation requires a recursive definition:
 \mathit{Assoc}'(x, \mathit{pred}(y)) \lor \mbox{}
 (\mathit{Second}(x) \land \mathit{Last}(y))\)
 
-Intuitively, it spreads the first tonal term to all syllables and
+Effectively, it spreads the first tonal term to all syllables and
 associates the second tonal term to the last syllable.
 
 The combination of the two transformations is more involved, but not
@@ -1757,7 +1753,7 @@ the combined transformation is
 \subsection{Linear Analysis}
 At this point, it is worth it to revisit the linear transformation.
 As we notice, there are only \textemph{two} possible configurations in
-the non-\textform{yángrù} pattern.  This results in a correspondence
+the non-\textform{yángrù} patterns.  This results in a correspondence
 to the previously assumed linear representations:
 
 \ex.
@@ -1857,8 +1853,8 @@ The remaining syllables are assigned neutral tones:
 
 The above transformation, like its autosegmental counterpart, is
 nonrecursive.  However, the \textform{yángrù} pattern still requires a
-recursive definition, given that it is characteristically an unbounded
-tone spreading rule:
+recursive definition given that it is characteristically a tone
+spreading rule:
 
 \ex.
 \a. \(\grave{\sigma}'(x) \coloneq
@@ -1867,14 +1863,15 @@ tone spreading rule:
 \b. \(\check{\sigma}'(x) \coloneq \mathit{Last}(x)\)
 
 The combination of the two transformations, again, requires the
-distinction between the \textform{yángrù} pattern and
-non-\textform{yángrù} patterns.  The same technique can be adapted to
-the linear transformation, with the caveat that tone spreading applies
-up to the \textemph{penultimate} syllable.  The resulting transduction
-is as follows, omitting predicates that carry their original
+distinction between the \textform{yángrù} and non-\textform{yángrù}
+patterns.  The same technique can be adapted to the linear
+transformation, with the caveat that tone spreading applies up to the
+\textemph{penultimate} syllable.  The resulting transduction is as
+follows, omitting predicates that carry their original
 definitions:\footnote{For convenience, \textform{yángrù} is assumed to
   be a unique tone in the inputs, although such an assumption does not
-  otherwise change the overall complexity.}
+  otherwise change the overall complexity, as \textform{yángrù} can be
+  recognized by the segmental features.}
 
 \ex.
 \a. \(
@@ -2095,8 +2092,8 @@ transduction.  Indeed, the transduction is defined as
 where \(\mathit{Rel}_{\mathit{Mor}}\) causes the unfortunate presence
 of existential quantification.  In \textcite{z20eaislfmdft}, this
 existential quantification is left out from the transduction,
-resulting in the mischaracterization of it as strictly local.  This
-cannot be true as the transduction must be logically closed, while the
+resulting in its mischaracterization as strictly local.  This cannot
+be true, as the transduction must be logically closed, while the
 removal of the existential quantification leads to a free variable.
 Regardless, this transduction produces the following mappings:
 
@@ -2141,13 +2138,14 @@ Regardless, this transduction produces the following mappings:
 \end{forest}\)
 
 
-As a last resort, we can consider how to preserve the intuition of the
-transduction while removing the unnecessary assumptions.  An immediate
-notice to make is that the addition of \(\mathit{Rel}_{\mathit{Mor}}\)
-contributes nothing to the transduction whatsoever.  It is introduced
-purely on a theoretical basis, much like what we have seen in Shanghai
-Wu.  Crucially, it disambiguates the cases where a floating tone can
-be either from the first or second syllable:
+As the very least, we can consider how to preserve the intuition of
+the transduction while removing the unnecessary assumptions.  An
+immediate note to make is that the addition of
+\(\mathit{Rel}_{\mathit{Mor}}\) contributes nothing to the
+transduction whatsoever.  It is introduced purely on a theoretical
+basis, much like what we have seen in the case of Shanghai Wu.
+Crucially, it disambiguates the cases where a floating tone can be
+either from the first or second syllable:
 
 \ex.
 \a.
@@ -2170,18 +2168,18 @@ be either from the first or second syllable:
 \end{forest}
 
 Nonetheless, there is the possibility that such a distinction is
-simply \textemph{unfeasible}, given that existential quantification is
+simply \textemph{unfeasible} given that existential quantification is
 needed to make use of the morphemic information.  In fact, it is
-rather reminiscent of the problem of grouping discussed above.  At the
-very least, this scenario does not appear in Suzhou Wu, not even when
-\enquote{light}-initial sequences are concerned, although they will
-not be the focus here.
+rather reminiscent of the problem of grouping previously discussed.
+Moreover, this scenario does not appear in Suzhou Wu, not even when
+\enquote{light}-initial sequences are concerned.
 
 Another problem is that the transduction is forced to assume that the
-second tonal term for exceptional patterns must always be underlyingly
-associated with the first syllable.  This assumption is acceptable as
-a phonotactic condition, but it does raise the question whether it can
-be dropped.  Overall, the modified transduction is defined as
+relevant tonal terms for exceptional patterns must always be
+underlyingly associated with the first syllable.  This assumption is
+acceptable as a phonotactic condition, but it does raise the question
+whether it can be dropped.  Overall, the modified transduction is
+defined as
 
 \ex. \(
 \begin{aligned}[t]
@@ -2327,8 +2325,8 @@ relations.  Binary relations are convertible to predicates through
 quantification, but doing so essentially creates a surjection, that
 is, many-to-one mapping.  Linear representations, on the other hand,
 avoid the problem altogether due to the lack of binary relations.  Our
-purpose is not arguing for one representation over the other, but
-merely emphasizing the essential properties of each representation.
+purpose is not to argue for one representation over the other, but
+merely to emphasize the essential properties of each representation.
 
 \section{Interim Summary}
 A recurring debate in theoretical linguistics is the nature of the
@@ -2363,7 +2361,7 @@ This chapter summarizes and discusses the findings of this thesis.
 The comparison between the computational and theoretical approaches to
 phonology is presented, followed by future prospects that aim to
 extend on the findings.  See also the interim summaries of the
-previous chapters for the theoretical implications.
+previous chapters for the theoretical interpretations.
 
 \section{Computation vs.\ Theory}
 There is admittedly a gap between computational models and theoretical
@@ -2415,28 +2413,28 @@ partial functions.
 \paragraph{What is Interface?}
 Interface is an often referenced but seldom defined concept.  From a
 computational perspective, an \textterm{interface} defines what
-information can be communicated between two modules.  The two modules
+information can be communicated between two levels.  The two levels
 must interact in such a manner that respects the interface, which
-forces us to clearly state what each module does.  However, we have
+forces us to clearly state what each level does.  However, we have
 seen that some theoretical proposals entangle morphosyntax and
 phonology, contradicting this understanding of interface.
 
 Recently, advances in theoretical morphology have brought to us
-decompositional theories, such as \posscite{hm93dmpi} distributed
-morphology and \posscite{c09nc} nanosyntax.  A computational study of
-them will hopefully improve our understanding of the
-morphosyntax--phonology interface, especially in contrast to
-process-based theories such as \textcite{a92am}.
+several \enquote{decompositional} theories, such as
+\posscite{hm93dmpi} distributed morphology and \posscite{c09nc}
+nanosyntax.  A computational study of them will hopefully improve our
+understanding of the morphosyntax--phonology interface, especially in
+contrast to \enquote{process-based} theories such as \textcite{a92am}.
 
 \paragraph{Wishful Thinking}
-This thesis adopts a \enquote{wishful thinking} that the logical
-formulae used actually made sense.  Keen-eyed readers will notice that
-some logical formulae are neither input nor recursive strictly local,
-where both the input and recursive predicates use either the
+This thesis adopts a \enquote{wishful thinking} that all defined
+logical transductions actually made sense.  Keen-eyed readers will
+notice that some of them are neither input nor recursive strictly
+local, where both the input and recursive predicates use either the
 predecessor or successor function.  This thesis wishes that such
-logical formulae made sense by conjecturing that they correspond to
-input--output strictly local functions.  Whether this is true and how
-this extends to autosegmental representations remain unanswered.
+logical transductions made sense by conjecturing that they correspond
+to input--output strictly local functions.  Whether this is true and
+how this extends to autosegmental representations remain unanswered.
 
 \printbibliography[heading=bibintoc]
 
