@@ -9,7 +9,7 @@
 \documentclass[12pt, a4paper]{report}
 \usepackage{imakeidx}
 \usepackage{setspace}
-\usepackage[type={CC},modifier={by-sa},version={4.0}]{doclicense}
+\usepackage[type=CC, modifier=by-sa, version=4.0]{doclicense}
 \usepackage[margin=1in]{geometry}
 \usepackage{lua-widow-control}
 \usepackage{microtype}
@@ -50,7 +50,7 @@
 
 \usetikzlibrary{automata}
 \tikzset{auto}
-\forestset{auto/.style={for root={baseline}, for tree={calign=first}}}
+\forestset{auto/.style={for root=baseline, for tree={calign=first}}}
 
 \newcommand{\context}{\mathrel{/}}
 \newcommand{\cuhk}{The Chinese University of Hong Kong}
@@ -433,11 +433,11 @@ after the whole input sequence is read:
 
 \ex.
 \begin{tikzpicture}[baseline=(bow.base)]
-  \node[state] at (0,0) (bow) {\(q_{1}\)};
-  \node[state,accepting] at (2,1) (noop) {\(q_{2a}\)};
-  \node[state] at (4,1) (invalid) {\(q_{3a}\)};
-  \node[state] at (2,-1) (write) {\(q_{2b}\)};
-  \node[state,accepting] at (4,-1) (valid) {\(q_{3b}\)};
+  \node[state] at (0, 0) (bow) {\(q_{1}\)};
+  \node[state, accepting] at (2, 1) (noop) {\(q_{2a}\)};
+  \node[state] at (4, 1) (invalid) {\(q_{3a}\)};
+  \node[state] at (2, -1) (write) {\(q_{2b}\)};
+  \node[state, accepting] at (4, -1) (valid) {\(q_{3b}\)};
   \path[->]
   (bow) edge [loop left] node {\(\text{?}:\text{?}\)} ()
   (bow) edge node {\(a:a\)} (noop)
@@ -563,8 +563,8 @@ rewrites \(a\) to \(b\) whenever the last input is \(a\).  That is,
 where \(n \in \mathbb{N}\), with the equivalent transducer
 
 \ex.
-\begin{tikzpicture}[baseline=(loop.base)]
-  \node[state,initial,initial text={\(a:a\)}] at (0,0) (loop) {\(a\)};
+\begin{tikzpicture}[baseline=(loop.base), initial text=\(a:a\)]
+  \node[state, initial] at (0, 0) (loop) {\(a\)};
   \path[->] (loop) edge [loop right] node {\(a:b\)} ();
 \end{tikzpicture}
 
@@ -588,9 +588,9 @@ function that rewrites \(a\) to \(b\) whenever the last output is
 with the equivalent transducer
 
 \ex.
-\begin{tikzpicture}[baseline=(a.base)]
-  \node[state,initial,initial text={\(a:a\)}] at (0,0) (a) {\(a\)};
-  \node[state] at (2,0) (b) {\(b\)};
+\begin{tikzpicture}[baseline=(a.base), initial text=\(a:a\)]
+  \node[state, initial] at (0, 0) (a) {\(a\)};
+  \node[state] at (2, 0) (b) {\(b\)};
   \path[->]
   (a) edge [bend left] node {\(a:b\)} (b)
   (b) edge [bend left] node {\(a:a\)} (a);
