@@ -1,0 +1,13 @@
+# Copyright (C) 2023 Wing Hei Chan
+
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+
+#+title: Subregular Complexity of Tonal Systems
+
+[[https://doi.org/10.5281/zenodo.7907005][file:https://zenodo.org/badge/DOI/10.5281/zenodo.7907005.svg]]
+
+This repository holds my bachelor's thesis.  To compile the PDF file,
+run [[https://www.ctan.org/pkg/light-latex-make][~llmk~]] under an appropriate TeX Live environment.
