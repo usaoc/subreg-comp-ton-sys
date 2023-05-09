@@ -1038,13 +1038,13 @@ over autosegmental representations:
 \b. \(\mathit{SameConst}(x, y) \coloneq \exists z\ldotp
 \mathit{Dom}(z, x) \land \mathit{Dom}(z, y)\)
 \b. \(\mathit{SepFullFeet}(x, y) \coloneq \exists z, w\ldotp
-z \neq w \land \mathit{FullFeet}(z, x) \land \mathit{FullFeet}(w, y)\)
-\b. \(\mathit{FullFeet}(x, y) \coloneq \mathit{Feet}(x, y) \land
-(\exists z\ldotp \mathit{Feet}(x, z) \land
-(\mathit{prec}(y) = z \lor \mathit{succ}(y) = z))\)
+z \neq w \land \mathit{FullFoot}(z, x) \land \mathit{FullFoot}(w, y)\)
+\b. \(\mathit{FullFoot}(x, y) \coloneq \mathit{Foot}(x, y) \land
+(\exists z\ldotp \mathit{Foot}(x, z) \land
+(\mathit{pred}(y) = z \lor \mathit{succ}(y) = z))\)
 
 \(\mathit{Dom}\) is the transitive closure of the syntactic
-association relation, and \(\mathit{Feet}\) is the prosodic
+association relation, and \(\mathit{Foot}\) is the prosodic
 association relation.  This is overcomplicated as a phonological
 process, at least from our point of view.
 
